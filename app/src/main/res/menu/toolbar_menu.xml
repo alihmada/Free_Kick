@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/upload"
+        android:icon="@drawable/upload_icon"
+        android:title="@string/upload"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/download_icon"
+        android:title="@string/download"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/qr"
+        android:title="@string/qr" />
+
+    <item
+        android:id="@+id/scanner"
+        android:title="@string/scanner" />
+
+    <!--    <item-->
+    <!--        android:id="@+id/online_history"-->
+    <!--        android:title="@string/online_history">-->
+    <!--        <menu>-->
+    <!--            <item-->
+    <!--                android:id="@+id/first_online_history"-->
+    <!--                android:title="@string/first_device" />-->
+    <!--            <item-->
+    <!--                android:id="@+id/second_online_history"-->
+    <!--                android:title="@string/second_device" />-->
+    <!--            <item-->
+    <!--                android:id="@+id/third_online_history"-->
+    <!--                android:title="@string/third_device" />-->
+    <!--            <item-->
+    <!--                android:id="@+id/fourth_online_history"-->
+    <!--                android:title="@string/fourth_device" />-->
+    <!--        </menu>-->
+    <!--    </item>-->
+
+    <item
+        android:id="@+id/delAll"
+        android:title="@string/delete_all" />
+
+    <item
+        android:id="@+id/exit"
+        android:title="@string/exit" />
+
+</menu>

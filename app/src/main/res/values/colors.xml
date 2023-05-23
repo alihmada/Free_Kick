@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- primary colors -->
+    <color name="jordy_blue">#AFC6FF</color>
+    <color name="YInMn_blue">#425D99</color>
+
+    <!-- hint color -->
+    <color name="sonic_silver">#7A7A7A</color>
+
+    <color name="dim_gray">#696969</color>
+    <color name="off">#FAFAFA</color>
+
+    <!-- color of ripple effect -->
+    <color name="Gains_boro">#DBDBDB</color> <!-- light theme -->
+    <color name="jet">#343434</color> <!-- dark theme -->
+
+</resources>

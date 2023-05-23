@@ -1,0 +1,144 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.FreeKick" parent="Theme.Material3.Light">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/jordy_blue</item>
+        <!-- color of icons -->
+        <item name="colorPrimaryInverse">@color/black</item>
+        <!-- color of ripple effect -->
+        <item name="colorPrimaryDark">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">@color/black</item>
+        <!-- Font -->
+        <item name="fontFamily">@font/metropolis_regular</item>
+        <!-- Text Colors -->
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/sonic_silver</item>
+        <!-- Text attributes -->
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="Theme.FreeKick" parent="Base.Theme.FreeKick" />
+
+    <style name="cardViewStyle" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="android:layout_margin">@dimen/margin</item>
+        <item name="android:padding">@dimen/padding</item>
+    </style>
+
+    <style name="textViewStyle">
+        <item name="android:layout_margin">@dimen/margin</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="drawableTint">@color/black</item>
+        <item name="android:background">@drawable/text_view</item>
+    </style>
+
+    <style name="spinnerStyle">
+        <item name="fontFamily">@font/metropolis_regular</item>
+        <item name="android:layout_margin">@dimen/margin</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:spinnerMode">dropdown</item>
+        <item name="android:background">@drawable/text_view</item>
+        <item name="android:gravity">center</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="radioButtonGroupStyle">
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="radioButtonStyle">
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="buttonTint">@color/black</item>
+    </style>
+
+    <style name="checkBoxStyle">
+        <item name="android:layout_marginStart">20dp</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:layout_gravity">start|center</item>
+        <item name="buttonTint">@color/black</item>
+        <item name="android:backgroundTint">@color/dim_gray</item>
+    </style>
+
+    <style name="buttonStyle">
+        <item name="android:layout_margin">@dimen/margin</item>
+        <item name="android:padding">@dimen/padding</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:shadowColor">@color/dim_gray</item>
+        <item name="elevation">@dimen/card_elevation</item>
+        <item name="android:background">@drawable/button_ripple_effect</item>
+        <item name="android:contentDescription">@string/app_name</item>
+        <item name="android:tint">@color/black</item>
+        <item name="android:shadowDx">3</item>
+        <item name="android:shadowDy">3</item>
+    </style>
+
+    <style name="selectedItemStyle">
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="text_field">
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="paddingStart">@dimen/horizontal_padding</item>
+        <item name="paddingEnd">@dimen/horizontal_padding</item>
+        <item name="android:cursorVisible">true</item>
+        <item name="android:inputType">text</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="general_text_input_layout" parent="text_input_layout">
+        <item name="endIconMode">clear_text</item>
+        <item name="android:textSize">@dimen/text_size</item>
+    </style>
+
+    <style name="control_input_style" parent="text_field">
+        <item name="android:enabled">false</item>
+        <item name="android:clickable">false</item>
+    </style>
+
+    <style name="text_input_layout">
+        <item name="boxBackgroundMode">outline</item>
+        <item name="boxCornerRadiusTopStart">@dimen/corner_size</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_size</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_size</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_size</item>
+        <item name="helperTextTextColor">@color/black</item>
+        <item name="android:layout_marginStart">@dimen/marginStartEnd</item>
+        <item name="android:layout_marginEnd">@dimen/marginStartEnd</item>
+        <item name="android:layout_marginTop">@dimen/marginTopBottom</item>
+        <item name="android:layout_marginBottom">@dimen/marginTopBottom</item>
+        <item name="helperTextEnabled">true</item>
+        <item name="placeholderText">@string/placeHolderText</item>
+    </style>
+
+    <style name="device_details_row_text_view">
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="recyclerview">
+        <item name="android:padding">5dp</item>
+    </style>
+</resources>

@@ -1,0 +1,156 @@
+<resources>
+    <string name="app_name">Free Kick</string>
+
+    <!-- controllers -->
+
+    <string name="txtStarting">Starting Time</string>
+    <string name="txtEnding">Ending Time</string>
+    <string name="radioButtonIndividual">Solo</string>
+    <string name="radioButtonMultiplayer">Multi</string>
+    <string name="time">Time</string>
+    <string name="price">Price</string>
+
+    <!-- calculate button -->
+
+    <string name="calculate">Calculate</string>
+    <string name="timer">Timer</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
+    <!-- calculate toast -->
+
+    <string name="open_time_running">Open time is running</string>
+    <string name="open_time_off">Open time is turned off</string>
+    <string name="timer_running">Timer is running</string>
+
+    <!-- edit text place holder -->
+
+    <string name="placeHolderText">Enter a time</string>
+
+    <!-- menu -->
+
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="controllers">Controllers</string>
+
+    <string name="qr">Qr constructor</string>
+    <string name="scanner">Scanner</string>
+
+    <string name="online_history">Online history</string>
+    <string name="first_device">First Device</string>
+    <string name="second_device">Second Device</string>
+    <string name="third_device">Third Device</string>
+    <string name="fourth_device">Fourth Device</string>
+
+    <string name="delete_all">Remove all data</string>
+    <string name="exit">Exit</string>
+
+    <!-- spinner -->
+
+    <string name="empty">Empty</string>
+    <string name="custom">Custom</string>
+
+    <string-array name="spinner_items">
+        <item>@string/empty</item>
+        <item>0.5</item>
+        <item>1</item>
+        <item>1.5</item>
+        <item>2</item>
+        <item>2.5</item>
+        <item>3</item>
+        <item>3.5</item>
+        <item>4</item>
+        <item>@string/custom</item>
+    </string-array>
+
+    <!-- not found error messages -->
+    <string name="starting_time_not_found">Please, Enter a starting time</string>
+    <string name="ending_input_not_found">Please, Enter a custom time or a custom price</string>
+
+    <!-- ending text error and helper -->
+    <string name="invalid_time_format">Please, check for time format</string>
+    <string name="time_price_match_helper">Please, long press to handle the</string>
+
+
+    <!-- headers -->
+    <string-array name="headers">
+        <item>@string/first_device</item>
+        <item>@string/second_device</item>
+        <item>@string/third_device</item>
+        <item>@string/fourth_device</item>
+    </string-array>
+
+    <!-- adding error message -->
+    <string name="check_for_data">Please, check for your data and try again</string>
+
+    <!-- history -->
+    <string name="empty_history">Empty history</string>
+
+    <!-- error_in_inputs -->
+    <string name="error_in_inputs">Please, check your inputs</string>
+
+    <!-- save -->
+    <string name="save_message_when_device_empty">Can not save, please check your inputs</string>
+
+    <!-- notifications -->
+    <string name="notification_content">The device must be evacuated</string>
+    <string name="notification_title">is finished</string>
+    <string name="required_to_be_paid">Required to be paid is</string>
+
+    <!-- Scanner -->
+    <string name="scan">Scan a QR Code</string>
+
+    <!-- on back press -->
+    <string name="tap_again">Tap again to exit app</string>
+
+    <!-- password dialog -->
+    <string name="password">Enter your password</string>
+    <string name="submit">Submit</string>
+    <string name="use_your_fingerprint">Use your fingerprint</string>
+    <string name="free_kick_verify">Free kick needs to verify it\'s you</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- progress dialog -->
+    <string name="loading">Loading…</string>
+
+    <!-- internet -->
+    <string name="no_internet">No internet connection</string>
+    <string name="data_uploaded">Data uploaded</string>
+    <string name="data_download">Downloaded successfully</string>
+
+    <!-- revenue -->
+    <string name="years">Years</string>
+    <string name="months">Months</string>
+    <string name="days">Days</string>
+    <string name="devices">Devices</string>
+    <string name="device_number">Device number</string>
+
+    <!-- saved -->
+    <string name="saved">Saved</string>
+
+
+    <!-- controllers -->
+
+    <string name="id">ID</string>
+    <string name="time_of_last_repairing">Time of last repairing</string>
+    <string name="body">Body</string>
+    <string name="right_analog">Right analog</string>
+    <string name="left_analog">Left analog</string>
+    <string name="stocks">Stock control unit</string>
+    <string name="xo">Button control unit</string>
+    <string name="option">Option button</string>
+    <string name="share">Share button</string>
+    <string name="table">Table</string>
+    <string name="l1l2">L1 و L2</string>
+    <string name="r1r2">R1 و R2</string>
+    <string name="socket">Socket</string>
+    <string name="battery">Battery</string>
+    <string name="motherboard">Motherboard</string>
+    <string name="inner_cable">Inner cable</string>
+
+    <string name="error_placeholder">Please, Enter your problem</string>
+
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+
+</resources>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ضربة حرة</string>
+
+    <!-- controllers -->
+
+    <string name="txtStarting">وقت البداية</string>
+    <string name="txtEnding">وقت النهاية</string>
+    <string name="radioButtonIndividual">فردى</string>
+    <string name="radioButtonMultiplayer">زوجى</string>
+    <string name="time">الوقت</string>
+    <string name="price">السعر</string>
+
+    <!-- calculate button -->
+
+    <string name="calculate">حساب</string>
+    <string name="timer">المؤقت</string>
+    <string name="start">بدء</string>
+    <string name="stop">إيقاف</string>
+
+    <!-- calculate toast -->
+
+    <string name="open_time_running">الوقت المفتوح يعمل</string>
+    <string name="open_time_off">تم ايقاف الوقت المفتوح</string>
+    <string name="timer_running">المؤقت يعمل</string>
+
+
+    <!-- edit text place holder -->
+
+    <string name="placeHolderText">ادخل وقت</string>
+
+    <!-- menu -->
+
+    <string name="upload">رفع البيانات</string>
+    <string name="download">تنزيل البيانات</string>
+    <string name="controllers">وحدات التحكم</string>
+
+    <string name="qr">qr إنشاء</string>
+    <string name="scanner">الماسح</string>
+
+    <string name="online_history">سجل الإنترنت</string>
+    <string name="first_device">الجهاز الأول</string>
+    <string name="second_device">الجهاز الثانى</string>
+    <string name="third_device">الجهاز الثالث</string>
+    <string name="fourth_device">الجهاز الرابع</string>
+
+    <string name="delete_all">مسح بيانات جميع الأجهزة</string>
+    <string name="exit">خروج</string>
+
+    <!-- spinner -->
+
+    <string name="empty">فارغ</string>
+    <string name="custom">مخصص</string>
+
+    <string-array name="spinner_items">
+        <item>@string/empty</item>
+        <item>0.5</item>
+        <item>1</item>
+        <item>1.5</item>
+        <item>2</item>
+        <item>2.5</item>
+        <item>3</item>
+        <item>3.5</item>
+        <item>4</item>
+        <item>@string/custom</item>
+    </string-array>
+
+    <!-- ending error messages -->
+    <string name="ending_input_not_found">من فضلك قم بإدخال وقت او سعر</string>
+    <string name="starting_time_not_found">من فضلك قم بإدخال وقت البداية</string>
+
+    <!-- ending text error and helper -->
+    <string name="invalid_time_format">من فضلك قم بالتحقق من تنسيق الوقت</string>
+    <string name="time_price_match_helper">من فضلك قم بالضغط المطول للتعامل مع</string>
+
+    <!-- adding error message -->
+    <string name="check_for_data">من فضلك ، تحقق من البيانات الخاصة بك وحاول مرة أخرى</string>
+
+    <!-- history -->
+    <string name="empty_history">السجل فارغ</string>
+
+    <!-- -->
+    <string name="error_in_inputs">من فضلك راجع البيانات المدخلة</string>
+
+    <!-- save -->
+    <string name="save_message_when_device_empty">لا يمكن حفظ البيانات ، من فضلك راجع البيانات المدخلة</string>
+
+    <!-- Notifications -->
+    <string name="notification_content">قم بإيقاف تشغيل الجهاز</string>
+    <string name="notification_title">انتهى وقته</string>
+    <string name="required_to_be_paid">المطلوب دفعه هو</string>
+
+    <!-- Scanner -->
+    <string name="scan">قم بمسح رمز الـQR</string>
+
+    <!-- on back press -->
+    <string name="tap_again">انقر مرة أخرى للخروج من التطبيق</string>
+
+    <!-- progress dialog -->
+    <string name="loading">جارى التحميل…</string>
+
+    <!-- password dialog -->
+    <string name="password">ادخل كلمة المرور</string>
+    <string name="submit">تأكيد</string>
+    <string name="use_your_fingerprint">استخدم بصمة إصبعك</string>
+    <string name="free_kick_verify">ضربة حرة يحتاج إلى التحقق من هويتك</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- internet -->
+    <string name="no_internet">خطأ فى الإتصال بالإنترنت</string>
+    <string name="data_uploaded">تم رفع البيانات بنجاح</string>
+    <string name="data_download">تم تنزيل البيانات بنجاح</string>
+
+    <!-- revenue -->
+    <string name="years">السنوات</string>
+    <string name="months">الشهور</string>
+    <string name="days">الأيام</string>
+    <string name="devices">الأجهزة</string>
+    <string name="device_number">جهاز رقم</string>
+
+    <!-- saved -->
+    <string name="saved">تم الحفظ</string>
+
+
+    <!-- controllers -->
+
+    <string name="id">الرقم التعريفى</string>
+    <string name="time_of_last_repairing">متى كان اخر اصلاح؟</string>
+    <string name="body">الهيكل الخارجى</string>
+    <string name="right_analog">الانالوج اليمين</string>
+    <string name="left_analog">الانالوج الشمال</string>
+    <string name="stocks">الاسهم</string>
+    <string name="xo">الازرار</string>
+    <string name="option">زر الخيارات</string>
+    <string name="share">زر المشاركة</string>
+    <string name="table">اللوحة الخارجية</string>
+    <string name="l1l2">L1 and L2</string>
+    <string name="r1r2">R1 and R2</string>
+    <string name="socket">مدخل الشاحن</string>
+    <string name="battery">البطارية</string>
+    <string name="motherboard">اللوحة الام</string>
+    <string name="inner_cable">الكابل الداخلى</string>
+
+    <string name="error_placeholder">من فضلك ادخل المشكلة</string>
+
+    <string name="save">حفظ</string>
+    <string name="edit">تعديل</string>
+
+</resources>
