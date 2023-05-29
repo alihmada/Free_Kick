@@ -48,7 +48,7 @@ public class Controllers extends AppCompatActivity {
                 getScannedController(code);
             }
         }
-    });
+    }); // End of registerForActivityResult()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class Controllers extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getScannedController(getIntent().getStringExtra(Common.CODE));
-    }
+    } // End of onCreate()
 
     private void setCustomActionBar() {
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -85,13 +85,13 @@ public class Controllers extends AppCompatActivity {
 
             }
         });
-    }
+    } // End of getScannedController()
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.controller_menu, menu);
         return true;
-    }
+    } // End of onCreateOptionsMenu()
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -103,6 +103,7 @@ public class Controllers extends AppCompatActivity {
             scanOptionsActivityResultLauncher.launch(scanOptions);
         }
         return super.onOptionsItemSelected(item);
-    }
 
-}
+    } // End of onOptionsItemSelected()
+
+} // End of Controllers()

@@ -233,20 +233,13 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
             intent.putExtra(Common.TITLE, getString(R.string.device_number).concat(" ").concat(position));
 
             startActivity(intent);
-
         }
     }
 
     @Override
     public void languageHandler(RevenueDeviceData revenueDeviceData) {
         if (revenueDeviceData != null) {
-            if (revenueDeviceData.getStart().contains("م") || revenueDeviceData.getStart().contains("ص")) {
-                if (Locale.getDefault().getLanguage().equals("en")) {
-                    revenueDeviceData.setStart(revenueDeviceData.getStart().replace("م", "PM").replace("ص", "AM"));
-                    revenueDeviceData.setEnd(revenueDeviceData.getEnd().replace("م", "PM").replace("ص", "AM"));
-                    revenueDeviceData.setState(revenueDeviceData.getState().replace("فردى", getString(R.string.radioButtonIndividual)).replace("زوجى", getString(R.string.radioButtonMultiplayer)));
-                }
-            } else if (revenueDeviceData.getStart().contains("PM") || revenueDeviceData.getStart().contains("AM")) {
+            if (revenueDeviceData.getStart().contains("PM") || revenueDeviceData.getStart().contains("AM")) {
                 if (Locale.getDefault().getLanguage().equals("ar")) {
                     revenueDeviceData.setStart(revenueDeviceData.getStart().replace("PM", "م").replace("AM", "ص"));
                     revenueDeviceData.setEnd(revenueDeviceData.getEnd().replace("PM", "م").replace("AM", "ص"));

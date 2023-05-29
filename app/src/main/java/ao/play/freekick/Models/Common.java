@@ -1,8 +1,8 @@
 package ao.play.freekick.Models;
 
 public class Common {
-    public static final String SHARED_PREFERENCE_NAME = "freekick";
-    public static final String PASSWORD = "AO#558721#.";
+    public static final String SHARED_PREFERENCE_NAME = "9bcbKJMXOoMZss1GLo+oew==";
+    public static final String PASSWORD = "KheLm5O77Cq6jFcM5Wzsqw==";
     public static final int DEVICES_NUMBER = 4;
     public static final int HOUR = 60;
     public static final int HOUR_PRICE = 10;
@@ -10,10 +10,10 @@ public class Common {
     public static final String NOTIFICATION_CONTENT = "content";
     public static final String NOTIFICATION_TITLE = "title";
     public static final String USER_PASSWORD = "user_password";
-    public static final String PENDING_INTENT = "pending";
     public static final String SHARED_PREFERENCES_KEY = "device_key";
     public static final String THREAD_POSITION = "thread_position";
     public static final String ROOT = "Root";
+    public static final String RANDOM_KEY = "random";
     public static final String DATA_BASE_NAME = "Database";
     public static final String TITLE = "title";
     public static final String YEAR = "year";

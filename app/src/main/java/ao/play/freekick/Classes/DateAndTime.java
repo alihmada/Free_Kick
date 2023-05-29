@@ -88,6 +88,10 @@ public class DateAndTime {
         return String.valueOf(Duration.parse(duration1).plus(Duration.parse(duration2)));
     }
 
+    public static String durationMinus(String duration1, String duration2) {
+        return String.valueOf(Duration.parse(duration1).minus(Duration.parse(duration2)));
+    }
+
     public static String getYear() {
         return Integer.toString(LocalDate.now().getYear());
     }

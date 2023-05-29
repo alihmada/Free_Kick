@@ -99,7 +99,7 @@ public class Home extends AppCompatActivity implements ViewListener {
                 }
             }
         }
-    });
+    }); // End of registerForActivityResult()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,25 +143,28 @@ public class Home extends AppCompatActivity implements ViewListener {
         findViewById(R.id.tool_bar_title).setOnLongClickListener(v -> {
             if (sharedPreferences.getString(Common.USER_PASSWORD, "").equals("")) {
                 Password password = new Password(passcode -> {
-                    if (passcode.equals(Common.PASSWORD)) {
+                    try {
+                        if (passcode.equals(EncryptionAndDecryption.decrypt(Common.PASSWORD))) {
 
-                        Intent revenue = new Intent(Home.this, Revenue.class);
-                        revenue.putExtra(Common.TITLE, getString(R.string.years));
-                        revenue.putExtra(Common.YEAR, true);
+                            Intent revenue = new Intent(Home.this, Revenue.class);
+                            revenue.putExtra(Common.TITLE, getString(R.string.years));
+                            revenue.putExtra(Common.YEAR, true);
 
-                        startActivity(revenue);
+                            startActivity(revenue);
 
-                        if (fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints()) {
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(Common.USER_PASSWORD, passcode);
-                            editor.apply();
+                            if (fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints()) {
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(Common.USER_PASSWORD, passcode);
+                                editor.apply();
+                            }
+
+                            Intent intent = new Intent(this, PasswordRemovalService.class);
+                            startService(intent);
+
+                        } else {
+                            Toast.makeText(this, "😒", Toast.LENGTH_LONG).show();
                         }
-
-                        Intent intent = new Intent(this, PasswordRemovalService.class);
-                        startService(intent);
-
-                    } else {
-                        Toast.makeText(this, "😒", Toast.LENGTH_LONG).show();
+                    } catch (Exception ignored) {
                     }
                 });
 
@@ -200,13 +203,16 @@ public class Home extends AppCompatActivity implements ViewListener {
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
-        sharedPreferences = getSharedPreferences(Common.SHARED_PREFERENCE_NAME, MODE_PRIVATE);
+        try {
+            sharedPreferences = getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+        } catch (Exception ignored) {
+        }
 
         gson = new Gson();
 
         recyclerView = findViewById(R.id.home_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-    }
+    } // End of itemsDeclaration()
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -323,7 +329,7 @@ public class Home extends AppCompatActivity implements ViewListener {
 
             }
         });
-    }
+    } // End of download()
 
     @Override
     public void languageHandler(Device device, int position) {

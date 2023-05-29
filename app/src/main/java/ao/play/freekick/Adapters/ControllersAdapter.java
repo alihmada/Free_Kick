@@ -25,14 +25,14 @@ public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.
 
     public ControllersAdapter(List<Controller> controllerList) {
         this.controllerList = controllerList;
-    }
+    } // End of ControllersAdapter()
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.controller_row, parent, false);
         return new ViewHolder(view);
-    }
+    } // End of onCreateViewHolder()
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -52,12 +52,12 @@ public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.
         holder.battery.setText(controllerList.get(position).getBattery());
         holder.innerCable.setText(controllerList.get(position).getInnerCable());
         holder.motherboard.setText(controllerList.get(position).getMotherboard());
-    }
+    } // End of onBindViewHolder()
 
     @Override
     public int getItemCount() {
         return controllerList.size();
-    }
+    } // End of getItemCount()
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -102,13 +102,7 @@ public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.
                 }
                 edit.setEnabled(true);
                 save.setEnabled(false);
-                Firebase.getController().child(String.format("controller%s", id.getText())).setValue(new Controller(
-                        Objects.requireNonNull(id.getText()).toString(),
-                        text.get(0), text.get(1), text.get(2),
-                        text.get(3), text.get(4), text.get(5),
-                        text.get(6), text.get(7), text.get(8),
-                        text.get(9), text.get(10), text.get(11),
-                        text.get(12), text.get(13), text.get(14)));
+                Firebase.getController().child(String.format("controller%s", id.getText())).setValue(new Controller(Objects.requireNonNull(id.getText()).toString(), text.get(0), text.get(1), text.get(2), text.get(3), text.get(4), text.get(5), text.get(6), text.get(7), text.get(8), text.get(9), text.get(10), text.get(11), text.get(12), text.get(13), text.get(14)));
             });
 
             edit.setOnClickListener(v -> {
@@ -119,6 +113,7 @@ public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.
                     inputLayout.setEnabled(true);
                 }
             });
-        }
-    }
-}
+        } // End of ViewHolder()
+    } // End of ViewHolder
+
+} // End of ControllersAdapter

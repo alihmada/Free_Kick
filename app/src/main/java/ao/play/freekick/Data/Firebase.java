@@ -25,48 +25,45 @@ import ao.play.freekick.Models.RevenueDeviceData;
 import ao.play.freekick.R;
 
 public class Firebase {
-    static double annualTally, monthlyTally, dailyTally, deviceOutcome;
-    static String annualDuration, monthlyDuration, dailyDuration, deviceDuration;
-
     public static DatabaseReference getRoot() {
         return FirebaseDatabase.getInstance().getReference(Common.ROOT);
-    }
+    } // End getRoot()
 
     public static DatabaseReference getDatabase() {
         return getRoot().child(Common.DATA_BASE_NAME);
-    }
+    } // End getDatabase()
 
     public static DatabaseReference getYear(String year) {
         return getDatabase().child(year);
-    }
+    } // End getYears()
 
     public static DatabaseReference getMonth(String year, String month) {
         return getYear(year).child(month);
-    }
-
-    public static DatabaseReference getDay(String year, String month, String day) {
-        return getMonth(year, month).child(day);
-    }
-
-    public static DatabaseReference getDevice(String year, String month, String day, String device) {
-        return getDay(year, month, day).child(device);
-    }
+    } // End getMonth()
 
     public static DatabaseReference getMonth(DatabaseReference year, String month) {
         return year.child(month);
-    }
+    } // End getMonth()
+
+    public static DatabaseReference getDay(String year, String month, String day) {
+        return getMonth(year, month).child(day);
+    } // End getDay()
 
     public static DatabaseReference getDay(DatabaseReference month, String day) {
         return month.child(day);
-    }
+    } // End getDay()
+
+    public static DatabaseReference getDevice(String year, String month, String day, String device) {
+        return getDay(year, month, day).child(device);
+    } // End getDevice()
 
     public static DatabaseReference getDevice(DatabaseReference day, String device) {
         return day.child(device);
-    }
+    } // End getDevice()
 
     public static DatabaseReference getController() {
         return getRoot().child(Common.CONTROLLERS);
-    }
+    } // End getController()
 
     public static void upload(Device[] data, Context context) {
         Loading.showProgressDialog();
@@ -117,7 +114,6 @@ public class Firebase {
 
         });
 
-
         DatabaseReference month = getMonth(year, DateAndTime.getMonth());
 
         month.child(Common.NUMBER).setValue(DateAndTime.getMonth()).addOnSuccessListener(unused -> {
@@ -160,192 +156,62 @@ public class Firebase {
 
         DatabaseReference device = getDevice(day, deviceNumber);
 
-        queryGetStarting(year, month, day, device, deviceNumber, context, revenueDeviceData);
+        queryGetStarting(year, month, day, device, deviceNumber, revenueDeviceData, context);
     } //End save()
 
-    private static void onSuccess(Void unused) {
-
-    }
-
-    private static void queryGetStarting(DatabaseReference year, DatabaseReference month, DatabaseReference day, DatabaseReference device, String deviceNumber, Context context, RevenueDeviceData revenueDeviceData) {
+    private static void queryGetStarting(DatabaseReference year, DatabaseReference month, DatabaseReference day, DatabaseReference device, String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
 
         Query query = device.orderByChild("start").equalTo(revenueDeviceData.getStart());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    device.child(Common.NUMBER).setValue(deviceNumber).addOnSuccessListener(Firebase::onSuccess).addOnFailureListener(e -> {
-                    });
+                if (snapshot.exists()) {
+                    RevenueDeviceData deviceData;
 
-                    device.child(Common.PRICE).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @SuppressWarnings("ConstantConditions")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        deviceData = dataSnapshot.getValue(RevenueDeviceData.class);
 
-                            if (snapshot.exists()) {
-                                deviceOutcome = Double.parseDouble(snapshot.getValue().toString()) + Double.parseDouble(revenueDeviceData.getPrice());
-                            } else {
-                                deviceOutcome = Double.parseDouble(revenueDeviceData.getPrice());
-                            } // device if - else
+                        dataSnapshot.getRef().removeValue();
 
-                            device.child(Common.PRICE).setValue(deviceOutcome).addOnSuccessListener(unused -> day.child(Common.PRICE).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @SuppressWarnings("ConstantConditions")
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        assert deviceData != null;
+                        updatePriceInDelete(device.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
+                        updateDurationInDelete(device.child(Common.DURATION), deviceData, revenueDeviceData);
 
-                                    if (snapshot.exists()) {
-                                        dailyTally = Double.parseDouble(snapshot.getValue().toString()) + Double.parseDouble(revenueDeviceData.getPrice());
-                                    } else {
-                                        dailyTally = Double.parseDouble(revenueDeviceData.getPrice());
-                                    } // dailyTally if - else
+                        // Update day values
+                        updatePriceInDelete(day.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
+                        updateDurationInDelete(day.child(Common.DURATION), deviceData, revenueDeviceData);
 
-                                    day.child(Common.PRICE).setValue(dailyTally).addOnSuccessListener(unused -> month.child(Common.PRICE).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @SuppressWarnings("ConstantConditions")
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Update month values
+                        updatePriceInDelete(month.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
+                        updateDurationInDelete(month.child(Common.DURATION), deviceData, revenueDeviceData);
 
-                                            if (snapshot.exists()) {
-                                                monthlyTally = Double.parseDouble(snapshot.getValue().toString()) + Double.parseDouble(revenueDeviceData.getPrice());
-                                            } else {
-                                                monthlyTally = Double.parseDouble(revenueDeviceData.getPrice());
-                                            } // monthlyTally if - else
+                        // Update year values
+                        updatePriceInDelete(year.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
+                        updateDurationInDelete(year.child(Common.DURATION), deviceData, revenueDeviceData);
+                    }
+                } else {
 
-                                            month.child(Common.PRICE).setValue(monthlyTally).addOnSuccessListener(unused -> year.child(Common.PRICE).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @SuppressWarnings("ConstantConditions")
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    // Update device values
+                    device.child(Common.NUMBER).setValue(deviceNumber);
+                    updatePrice(device.child(Common.PRICE), revenueDeviceData.getPrice());
+                    updateDuration(device.child(Common.DURATION), revenueDeviceData);
 
-                                                    if (snapshot.exists()) {
-                                                        annualTally = Double.parseDouble(snapshot.getValue().toString()) + Double.parseDouble(revenueDeviceData.getPrice());
-                                                    } else {
-                                                        annualTally = Double.parseDouble(revenueDeviceData.getPrice());
-                                                    } // annualTally if - else
+                    // Update day values
+                    updatePrice(day.child(Common.PRICE), revenueDeviceData.getPrice());
+                    updateDuration(day.child(Common.DURATION), revenueDeviceData);
 
-                                                    year.child(Common.PRICE).setValue(annualTally).addOnSuccessListener(unused -> {
+                    // Update month values
+                    updatePrice(month.child(Common.PRICE), revenueDeviceData.getPrice());
+                    updateDuration(month.child(Common.DURATION), revenueDeviceData);
 
-                                                    }).addOnFailureListener(e -> {
-
-                                                    });
-                                                } // End month onDataChange()
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-                                                } // End month onCancelled()
-                                            })).addOnFailureListener(e -> {
-
-                                            });
-                                        } // End day onDataChange()
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                        } // End day onCancelled()
-                                    })).addOnFailureListener(e -> {
-
-                                    });
-                                } // End device onDataChange()
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                } // End device onCancelled()
-                            })).addOnFailureListener(e -> {
-
-                            });
-
-                        } // End device onDataChange()
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    }); // End device ValueEventListener()
-
-                    device.child(Common.DURATION).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @SuppressWarnings("ConstantConditions")
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                            if (snapshot.exists()) {
-                                deviceDuration = DateAndTime.durationPlus(snapshot.getValue().toString(), DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
-                            } else {
-                                deviceDuration = DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString();
-                            } // device if - else
-
-                            device.child(Common.DURATION).setValue(deviceDuration).addOnSuccessListener(unused -> day.child(Common.DURATION).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @SuppressWarnings("ConstantConditions")
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                    if (snapshot.exists()) {
-                                        dailyDuration = DateAndTime.durationPlus(snapshot.getValue().toString(), DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
-                                    } else {
-                                        dailyDuration = DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString();
-                                    } // dailyTally if - else
-
-                                    day.child(Common.DURATION).setValue(dailyDuration).addOnSuccessListener(unused -> month.child(Common.DURATION).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @SuppressWarnings("ConstantConditions")
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                            if (snapshot.exists()) {
-                                                monthlyDuration = DateAndTime.durationPlus(snapshot.getValue().toString(), DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
-                                            } else {
-                                                monthlyDuration = DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString();
-                                            } // dailyTally if - else
-
-                                            month.child(Common.DURATION).setValue(monthlyDuration).addOnSuccessListener(unused -> year.child(Common.DURATION).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @SuppressWarnings("ConstantConditions")
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                                                    if (snapshot.exists()) {
-                                                        annualDuration = DateAndTime.durationPlus(snapshot.getValue().toString(), DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
-                                                    } else {
-                                                        annualDuration = DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString();
-                                                    } // annualTally if - else
-
-                                                    year.child(Common.DURATION).setValue(annualDuration).addOnSuccessListener(unused -> {
-
-                                                    }).addOnFailureListener(e -> {
-
-                                                    });
-                                                } // End month onDataChange()
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-                                                } // End month onCancelled()
-                                            })).addOnFailureListener(e -> {
-
-                                            });
-                                        } // End day onDataChange()
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                        } // End day onCancelled()
-                                    })).addOnFailureListener(e -> {
-
-                                    });
-                                } // End device onDataChange()
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                } // End device onCancelled()
-                            })).addOnFailureListener(e -> {
-
-                            });
-
-                        } // End device onDataChange()
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    }); // End device ValueEventListener()
-
-                    device.push().setValue(revenueDeviceData).addOnSuccessListener(unused -> Toast.makeText(context, context.getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(context, context.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show());
+                    // Update year values
+                    updatePrice(year.child(Common.PRICE), revenueDeviceData.getPrice());
+                    updateDuration(year.child(Common.DURATION), revenueDeviceData);
                 }
+
+                // Push revenueDeviceData
+                device.push().setValue(revenueDeviceData).addOnSuccessListener(unused -> Toast.makeText(context, context.getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(context, context.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show());
             } // End query onDataChange()
 
             @Override
@@ -353,7 +219,75 @@ public class Firebase {
 
             }
         });
-    }
+    } //End queryGetStarting()
+
+    private static void updatePrice(DatabaseReference ref, String price) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double currentValue = 0.0;
+                if (snapshot.exists()) {
+                    currentValue = Double.parseDouble(String.valueOf(snapshot.getValue()));
+                }
+                double updatedValue = currentValue + Double.parseDouble(price);
+                ref.setValue(updatedValue);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled event
+            }
+        });
+    } // End updatePrice()
+
+    private static void updatePriceInDelete(DatabaseReference ref, RevenueDeviceData revenueDeviceData, String price) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double updatedValue = Double.parseDouble(String.valueOf(snapshot.getValue())) - Double.parseDouble(price);
+                ref.setValue(updatedValue).addOnSuccessListener(unused -> updatePrice(ref, revenueDeviceData.getPrice()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled event
+            }
+        });
+    } // End updatePriceInDelete()
+
+    private static void updateDuration(DatabaseReference ref, RevenueDeviceData revenueDeviceData) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String currentValue = "PT0M";
+                if (snapshot.exists()) {
+                    currentValue = String.valueOf(snapshot.getValue());
+                }
+                String updatedValue = DateAndTime.durationPlus(currentValue, DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
+                ref.setValue(updatedValue);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled event
+            }
+        });
+    } // End updateDuration()
+
+    private static void updateDurationInDelete(DatabaseReference ref, RevenueDeviceData previousRevenueDeviceData, RevenueDeviceData currentRevenueDeviceData) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.timeDifference(Firebase.languageHandler(previousRevenueDeviceData.getStart()), Firebase.languageHandler(previousRevenueDeviceData.getEnd())).toString());
+                ref.setValue(updatedValue).addOnSuccessListener(unused -> updateDuration(ref, currentRevenueDeviceData));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled event
+            }
+        });
+    } // End updateDurationInDelete()
 
     public static String languageHandler(String text) {
         if (text.contains("م") || text.contains("ص")) {
@@ -366,5 +300,5 @@ public class Firebase {
             }
         }
         return text;
-    }
+    } // End languageHandler()
 } //End Firebase

@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import ao.play.freekick.Classes.Calculations;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
+import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Interfaces.ViewListener;
 import ao.play.freekick.Models.Common;
@@ -176,7 +177,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             executorService = Executors.newSingleThreadScheduledExecutor();
 
-            sharedPreferences = context.getSharedPreferences(Common.SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+            try {
+                sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+            } catch (Exception ignored) {
+            }
 
             headers = context.getResources().getStringArray(R.array.headers);
             gson = new Gson();
@@ -228,7 +232,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    spinnerOnItemSelected();
+                    try {
+                        spinnerOnItemSelected();
+                    } catch (Exception e) {
+                        Toast.makeText(context, context.getString(R.string.error_in_inputs), Toast.LENGTH_SHORT).show();
+                    }
                     storeData();
                 }
 
@@ -448,11 +456,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     double saved = Double.parseDouble(header.getText().toString());
                     saved += Double.parseDouble(price.getText().toString());
 
+                    save();
+
                     delete(String.valueOf(saved));
 
                     starting.setText(DateAndTime.getCurrentTime());
 
                 } catch (Exception e) {
+
+                    save();
+
                     delete(price.getText().toString());
 
                     starting.setText(DateAndTime.getCurrentTime());
@@ -494,7 +507,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         private RevenueDeviceData getDeviceInstance() {
             Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()).equals("") ? DateAndTime.getCurrentTime() : String.valueOf(ending.getText()));
-            return new RevenueDeviceData(String.valueOf(starting.getText()), String.valueOf(ending.getText()).equals("") ? DateAndTime.getCurrentTime() : String.valueOf(ending.getText()), solo.isChecked() ? context.getString(R.string.radioButtonIndividual) : context.getString(R.string.radioButtonMultiplayer), DateAndTime.durationToClockFormat(duration), Calculations.priceCalculator(solo.isChecked(), duration));
+            return new RevenueDeviceData(languageHandler(String.valueOf(starting.getText())), String.valueOf(ending.getText()).equals("") ? languageHandler(DateAndTime.getCurrentTime()) : languageHandler(String.valueOf(ending.getText())), solo.isChecked() ? "Solo" : "Multi", DateAndTime.durationToClockFormat(duration), Calculations.priceCalculator(solo.isChecked(), duration));
         } // End of getDeviceInstance() -> save open time
 
         private void calculate() {
@@ -547,7 +560,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                     storeData();
 
-                    //Firebase.save(String.valueOf(getAdapterPosition() + 1), getDeviceInstance(), context);
+                    Firebase.save(String.valueOf(getAdapterPosition() + 1), getDeviceInstance(), context);
                 }
                 clickCounterForCalculate++;
             } else {
@@ -596,7 +609,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             intent.putExtra(Common.SHARED_PREFERENCES_KEY, String.valueOf(getAdapterPosition()));
             intent.putExtra(Common.THREAD_POSITION, getAdapterPosition());
 
-            intent.putExtra(Common.DEVICE, gson.toJson(new RevenueDeviceData(String.valueOf(starting.getText()), String.valueOf(ending.getText()), solo.isChecked() ? context.getString(R.string.radioButtonIndividual) : context.getString(R.string.radioButtonMultiplayer), DateAndTime.durationToClockFormat(duration), price)));
+            sharedPreferences.edit().putString(String.format("d%s", getAdapterPosition()), gson.toJson(getDeviceInstance())).apply();
 
             pendingIntent = PendingIntent.getBroadcast(context, getAdapterPosition(), intent, PendingIntent.FLAG_IMMUTABLE);
 
@@ -639,6 +652,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         private Device getDataFromHistory() {
             return gson.fromJson(sharedPreferences.getString(String.format("h%s", getAdapterPosition()), ""), Device.class);
         } // End of getDataFromHistory()
+
+        private String languageHandler(String text) {
+            if (text.contains("م") || text.contains("ص")) {
+                return text.replace("م", "PM").replace("ص", "AM");
+            }
+            return text;
+        }
 
     } // End of ViewHolder class
 

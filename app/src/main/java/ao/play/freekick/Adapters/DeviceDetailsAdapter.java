@@ -21,14 +21,14 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
     public DeviceDetailsAdapter(List<RevenueDeviceData> deviceData, ViewOnClickListener viewOnClickListener) {
         this.deviceData = deviceData;
         this.onClickListener = viewOnClickListener;
-    }
+    } // End of DeviceDetailsAdapter()
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.time_detail_layout, parent, false);
         return new ViewHolder(view);
-    }
+    } // End of onCreateViewHolder()
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -41,12 +41,12 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
         holder.state.setText(deviceData.get(position).getState());
         holder.time.setText(deviceData.get(position).getTime());
         holder.price.setText(deviceData.get(position).getPrice());
-    }
+    } // End of onBindViewHolder()
 
     @Override
     public int getItemCount() {
         return deviceData.size();
-    }
+    } // End of getItemCount()
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -61,6 +61,8 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
             state = itemView.findViewById(R.id.status);
             time = itemView.findViewById(R.id.user_time);
             price = itemView.findViewById(R.id.price);
-        }
-    }
-}
+        } // End of ViewHolder()
+
+    } // End of ViewHolder
+
+} // End of DeviceDetailsAdapter

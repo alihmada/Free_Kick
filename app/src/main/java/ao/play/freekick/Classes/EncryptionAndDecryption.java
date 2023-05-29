@@ -25,7 +25,7 @@ public class EncryptionAndDecryption {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new IvParameterSpec(iv.getBytes()));
         byte[] values = cipher.doFinal(value.getBytes());
         return Base64.encodeToString(values, Base64.DEFAULT);
-    }
+    } // End of encrypt()
 
     public static String decrypt(String value) throws InvalidAlgorithmParameterException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException {
         byte[] values = Base64.decode(value, Base64.DEFAULT);
@@ -33,5 +33,6 @@ public class EncryptionAndDecryption {
         Cipher cipher = Cipher.getInstance(mode);
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(iv.getBytes()));
         return new String(cipher.doFinal(values));
-    }
-}
+    } // End of decrypt()
+
+} // End of EncryptionAndDecryption
