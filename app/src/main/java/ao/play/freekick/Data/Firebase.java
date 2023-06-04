@@ -12,8 +12,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import ao.play.freekick.Classes.DateAndTime;
@@ -30,7 +28,11 @@ public class Firebase {
     } // End getRoot()
 
     public static DatabaseReference getDatabase() {
-        return getRoot().child(Common.DATA_BASE_NAME);
+        return getRoot().child(Common.DATABASE_NAME);
+    } // End getDatabase()
+
+    public static DatabaseReference getDevices() {
+        return getRoot().child(Common.DEVICE);
     } // End getDatabase()
 
     public static DatabaseReference getYear(String year) {
@@ -69,26 +71,12 @@ public class Firebase {
         Loading.showProgressDialog();
         if (!Internet.isConnected(context)) Loading.dismissProgressDialog();
 
-        getRoot().child(Common.DEVICE).addListenerForSingleValueEvent(new ValueEventListener() {
-            final List<Device> devices = new ArrayList<>();
-
+        getDevices().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // read data from device branch from firebase database
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    devices.add(dataSnapshot.getValue(Device.class));
-                }
-
-                // get history branch from firebase database
-                DatabaseReference devicesHistory = getRoot().child(Common.DEVICES_HISTORY);
-
-                // move the device branch data to history branch
-                for (int i = 0; i < devices.size(); i++)
-                    devicesHistory.child(String.valueOf(i)).setValue(devices.get(i));
-
                 // upload data to database
                 for (int i = 0; i < data.length; i++)
-                    getRoot().child(Common.DEVICE).child(String.valueOf(i)).setValue(data[i]);
+                    getDevices().child(String.valueOf(i)).setValue(data[i]);
 
                 Loading.dismissProgressDialog();
                 Toast.makeText(context, context.getString(R.string.data_uploaded), Toast.LENGTH_LONG).show();
@@ -108,51 +96,23 @@ public class Firebase {
 
         DatabaseReference year = getYear(DateAndTime.getYear());
 
-        year.child(Common.NUMBER).setValue(DateAndTime.getYear()).addOnSuccessListener(unused -> {
-
-        }).addOnFailureListener(e -> {
-
-        });
+        year.child(Common.NUMBER).setValue(DateAndTime.getYear());
 
         DatabaseReference month = getMonth(year, DateAndTime.getMonth());
 
-        month.child(Common.NUMBER).setValue(DateAndTime.getMonth()).addOnSuccessListener(unused -> {
+        month.child(Common.NUMBER).setValue(DateAndTime.getMonth());
 
-        }).addOnFailureListener(e -> {
+        month.child(Common.ARABIC_NAME).setValue(DateAndTime.getArabicNameOfMonth());
 
-        });
-
-        month.child(Common.ARABIC_NAME).setValue(DateAndTime.getArabicNameOfMonth()).addOnSuccessListener(unused -> {
-
-        }).addOnFailureListener(e -> {
-
-        });
-
-        month.child(Common.ENGLISH_NAME).setValue(DateAndTime.getEnglishNameOfMonth()).addOnSuccessListener(unused -> {
-
-        }).addOnFailureListener(e -> {
-
-        });
+        month.child(Common.ENGLISH_NAME).setValue(DateAndTime.getEnglishNameOfMonth());
 
         DatabaseReference day = getDay(month, DateAndTime.getDay());
 
-        day.child(Common.NUMBER).setValue(DateAndTime.getDay()).addOnSuccessListener(unused -> {
+        day.child(Common.NUMBER).setValue(DateAndTime.getDay());
 
-        }).addOnFailureListener(e -> {
+        day.child(Common.ARABIC_NAME).setValue(DateAndTime.getArabicNameOfDay());
 
-        });
-
-        day.child(Common.ARABIC_NAME).setValue(DateAndTime.getArabicNameOfDay()).addOnSuccessListener(unused -> {
-
-        }).addOnFailureListener(e -> {
-
-        });
-
-        day.child(Common.ENGLISH_NAME).setValue(DateAndTime.getEnglishNameOfDay()).addOnSuccessListener(unused -> {
-
-        }).addOnFailureListener(e -> {
-
-        });
+        day.child(Common.ENGLISH_NAME).setValue(DateAndTime.getEnglishNameOfDay());
 
         DatabaseReference device = getDevice(day, deviceNumber);
 

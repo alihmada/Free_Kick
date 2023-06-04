@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -33,9 +34,6 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import ao.play.freekick.Classes.Calculations;
 import ao.play.freekick.Classes.DateAndTime;
@@ -49,7 +47,8 @@ import ao.play.freekick.R;
 import ao.play.freekick.Receivers.AlarmReceiver;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
-    public static HashMap<Integer, ScheduledExecutorService> executorServiceHashMap = new HashMap<>();
+    public static HashMap<Integer, Handler> integerHandlerHashMap = new HashMap<>();
+    public static HashMap<Integer, Runnable> integerRunnableHashMap = new HashMap<>();
     List<Device> devices;
     Context context;
     ViewListener viewListener;
@@ -106,7 +105,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         ViewListener viewListener;
         AlarmManager alarmManager;
         PendingIntent pendingIntent;
-        ScheduledExecutorService executorService;
+        Handler handler;
+        Runnable runnable;
         Gson gson;
         TextView header, time, price;
         Spinner spinner;
@@ -117,9 +117,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         ImageButton delete, add, save, history;
         CheckBox payment;
         Button calculate;
+        Duration currentDuration, fullDuration, durationDifference;
         int clickCounterForStarting, clickCounterForEnding, clickCounterForCalculate, clickCounterForForward;
         long doubleClick;
-        boolean running, isForward = false;
+        boolean running, isForward = false, isOpenTime;
 
         public ViewHolder(@NonNull View itemView, Context context, ViewListener viewListener) {
             super(itemView);
@@ -175,7 +176,15 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         private void itemsDeclaration() {
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            executorService = Executors.newSingleThreadScheduledExecutor();
+            handler = new Handler();
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    if (isOpenTime) openTime();
+                    else closedTime();
+                    handler.postDelayed(this, Common.TIME_INTERVAL);
+                }
+            };
 
             try {
                 sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
@@ -326,9 +335,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (!executorService.isShutdown()) {
-                        shutdownExecutorService();
-                    }
+                    shutdownHandler();
                     shutdownAlarm();
                 }
             }); // End of starting.addTextChangedListener()
@@ -346,9 +353,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (!executorService.isShutdown()) {
-                        shutdownExecutorService();
-                    }
+                    shutdownHandler();
                     shutdownAlarm();
                 }
             }); // End of ending.addTextChangedListener()
@@ -426,11 +431,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         private void delete(String head) {
 
             clickCounterForCalculate = 0;
+            isOpenTime = false;
 
             pushToHistory();
 
             viewListener.vibration(0); // viewListener.vibrationEffect.EFFECT_CLICK
-            shutdownExecutorService();
+            shutdownHandler();
             shutdownAlarm();
             header.setText(head);
             spinner.setSelection(0);
@@ -518,11 +524,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 timeOutOfRange();
 
-                if (executorService.isTerminated()) {
-                    executorService = Executors.newScheduledThreadPool(1);
-                }
+                fullDuration = DateAndTime.timeDifference(String.valueOf(starting.getText()),
+                        String.valueOf(ending.getText()));
 
-                executorService.scheduleWithFixedDelay(this::closedTime, 1000, 250, TimeUnit.MILLISECONDS);
+                handler.postDelayed(runnable, Common.POST_DELAYED);
 
                 Toast.makeText(context, context.getString(R.string.timer_running), Toast.LENGTH_SHORT).show();
 
@@ -530,32 +535,31 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 storeData();
 
-                executorServiceHashMap.put(getAdapterPosition(), executorService);
+                integerHandlerHashMap.put(getAdapterPosition(), handler);
+                integerRunnableHashMap.put(getAdapterPosition(), runnable);
 
             } else if (timeFormatMatcher(String.valueOf(starting.getText())) && timeFormatMatcher(String.valueOf(ending.getText())) && DateAndTime.timeConverter(String.valueOf(starting.getText())).isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText()))) && LocalDateTime.now().isAfter(DateAndTime.timeConverter(String.valueOf(ending.getText())))) {
 
                 timeOutOfRange();
 
             } else if (timeFormatMatcher(String.valueOf(starting.getText())) && String.valueOf(ending.getText()).equals("")) {
+
+                isOpenTime = true;
+
                 if (Calculations.isEven(clickCounterForCalculate)) {
                     calculate.setText(context.getString(R.string.stop));
 
-                    if (executorService.isTerminated()) {
-                        executorService = Executors.newScheduledThreadPool(1);
-                    }
-
-                    executorService.scheduleAtFixedRate(this::openTime, 0, 250, TimeUnit.MILLISECONDS);
+                    handler.postDelayed(runnable, Common.POST_DELAYED);
 
                     Toast.makeText(context, context.getString(R.string.open_time_running), Toast.LENGTH_SHORT).show();
 
                     running = true;
 
                     storeData();
-
                 } else {
                     calculate.setText(context.getString(R.string.calculate));
                     ending.setText(DateAndTime.getCurrentTime());
-                    shutdownExecutorService();
+                    shutdownHandler();
                     Toast.makeText(context, context.getString(R.string.open_time_off), Toast.LENGTH_SHORT).show();
 
                     storeData();
@@ -570,17 +574,16 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         } // End of calculate()
 
         private void openTime() {
-            Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()));
+            currentDuration = DateAndTime.timeDifference(String.valueOf(starting.getText()));
 
-            time.setText(DateAndTime.durationToClockFormat(duration));
-            price.setText(Calculations.priceCalculator(solo.isChecked(), duration));
+            time.setText(DateAndTime.durationToClockFormat(currentDuration));
+            price.setText(Calculations.priceCalculator(solo.isChecked(), currentDuration));
         } // End of openTime()
 
         private void closedTime() {
             if (isForward) {
-                Duration duration1 = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()));
-                Duration duration2 = DateAndTime.timeDifference(String.valueOf(starting.getText()));
-                Duration durationDifference = duration1.minus(duration2);
+                currentDuration = DateAndTime.timeDifference(String.valueOf(starting.getText()));
+                durationDifference = fullDuration.minus(currentDuration);
 
                 time.setText(DateAndTime.durationToClockFormat(durationDifference));
                 price.setText(Calculations.priceCalculator(solo.isChecked(), durationDifference));
@@ -590,6 +593,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         } // End of closedTime()
 
         private void timeOutOfRange() {
+            isOpenTime = false;
             Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()));
 
             time.setText(DateAndTime.durationToClockFormat(duration));
@@ -633,13 +637,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             }
         } // End of shutdownAlarm()
 
-        private void shutdownExecutorService() {
-            if (!executorService.isTerminated()) {
-                executorService.shutdown();
+        private void shutdownHandler() {
+            try {
+                handler.removeCallbacks(runnable);
                 running = false;
                 storeData();
+            } catch (Exception ignored) {
             }
-        } // End of shutdownExecutorService()
+        } // End of shutdownHandler()
 
         private void storeData() {
             sharedPreferences.edit().putString(String.valueOf(getAdapterPosition()), gson.toJson(new Device(header.getText().toString(), String.valueOf(starting.getText()), String.valueOf(ending.getText()), spinner.getVisibility(), spinner.getSelectedItemPosition(), solo.isChecked(), payment.isChecked(), running))).apply();

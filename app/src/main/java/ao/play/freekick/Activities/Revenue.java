@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import ao.play.freekick.Adapters.DeviceDetailsAdapter;
+import ao.play.freekick.Adapters.HomeAdapter;
 import ao.play.freekick.Adapters.MonthsAndDaysAdapter;
 import ao.play.freekick.Adapters.YearsAndDevicesAdapter;
 import ao.play.freekick.Data.Firebase;
@@ -73,7 +74,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
                 }
             });
 
-        } else if (getIntent().getBooleanExtra(Common.MOTH, false)) {
+        } else if (getIntent().getBooleanExtra(Common.MONTH, false)) {
 
             Firebase.getYear(getIntent().getStringExtra(Common.YEAR_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<MonthAndDay> months = new ArrayList<>();
@@ -102,7 +103,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
         } else if (getIntent().getBooleanExtra(Common.DAY, false)) {
 
-            Firebase.getMonth(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MOTH_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getMonth(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<MonthAndDay> days = new ArrayList<>();
 
                 @Override
@@ -131,7 +132,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
             isDevice = true;
 
-            Firebase.getDay(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MOTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getDay(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<YearAndDevice> devices = new ArrayList<>();
 
                 @Override
@@ -158,7 +159,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
         } else if (getIntent().getBooleanExtra(Common.DEVICE_DETAILS, false)) {
 
-            Firebase.getDevice(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MOTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE), getIntent().getStringExtra(Common.DEVICE_NUMBER)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getDevice(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE), getIntent().getStringExtra(Common.DEVICE_NUMBER)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<RevenueDeviceData> devices = new ArrayList<>();
 
                 @Override
@@ -206,19 +207,19 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
         if (getIntent().getBooleanExtra(Common.YEAR, false)) {
             intent.putExtra(Common.YEAR_VALUE, position);
             intent.putExtra(Common.TITLE, getString(R.string.months));
-            intent.putExtra(Common.MOTH, true);
+            intent.putExtra(Common.MONTH, true);
 
             startActivity(intent);
-        } else if (getIntent().getBooleanExtra(Common.MOTH, false)) {
+        } else if (getIntent().getBooleanExtra(Common.MONTH, false)) {
             intent.putExtra(Common.YEAR_VALUE, getIntent().getStringExtra(Common.YEAR_VALUE));
-            intent.putExtra(Common.MOTH_VALUE, position);
+            intent.putExtra(Common.MONTH_VALUE, position);
             intent.putExtra(Common.DAY, true);
             intent.putExtra(Common.TITLE, getString(R.string.days));
 
             startActivity(intent);
         } else if (getIntent().getBooleanExtra(Common.DAY, false)) {
             intent.putExtra(Common.YEAR_VALUE, getIntent().getStringExtra(Common.YEAR_VALUE));
-            intent.putExtra(Common.MOTH_VALUE, getIntent().getStringExtra(Common.MOTH_VALUE));
+            intent.putExtra(Common.MONTH_VALUE, getIntent().getStringExtra(Common.MONTH_VALUE));
             intent.putExtra(Common.DAY_VALUE, position);
             intent.putExtra(Common.DEVICE, true);
             intent.putExtra(Common.TITLE, getString(R.string.devices));
@@ -226,11 +227,11 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
             startActivity(intent);
         } else if (getIntent().getBooleanExtra(Common.DEVICE, false)) {
             intent.putExtra(Common.YEAR_VALUE, getIntent().getStringExtra(Common.YEAR_VALUE));
-            intent.putExtra(Common.MOTH_VALUE, getIntent().getStringExtra(Common.MOTH_VALUE));
+            intent.putExtra(Common.MONTH_VALUE, getIntent().getStringExtra(Common.MONTH_VALUE));
             intent.putExtra(Common.DAY_VALUE, getIntent().getStringExtra(Common.DAY_VALUE));
             intent.putExtra(Common.DEVICE_NUMBER, position);
             intent.putExtra(Common.DEVICE_DETAILS, true);
-            intent.putExtra(Common.TITLE, getString(R.string.device_number).concat(" ").concat(position));
+            intent.putExtra(Common.TITLE, HomeAdapter.ViewHolder.headers[Integer.parseInt(position) - 1]);
 
             startActivity(intent);
         }
