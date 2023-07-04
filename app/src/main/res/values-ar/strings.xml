@@ -24,6 +24,9 @@
     <string name="open_time_off">تم ايقاف الوقت المفتوح</string>
     <string name="timer_running">المؤقت يعمل</string>
 
+    <!-- calculate dialog -->
+
+    <string name="are_you_sure_calculate">هل انت متاكد من انك تريد ايقاف المؤقت وحفظ البيانات؟</string>
 
     <!-- edit text place holder -->
 
@@ -44,6 +47,7 @@
     <string name="third_device">الجهاز الثالث</string>
     <string name="fourth_device">الجهاز الرابع</string>
 
+    <string name="delete">حذف</string>
     <string name="delete_all">مسح بيانات جميع الأجهزة</string>
     <string name="exit">خروج</string>
 
@@ -106,6 +110,9 @@
     <string name="free_kick_verify">ضربة حرة يحتاج إلى التحقق من هويتك</string>
     <string name="cancel">إلغاء</string>
 
+    <!-- customer name -->
+    <string name="customer_name">ادخل قيمة</string>
+
     <!-- internet -->
     <string name="no_internet">خطأ فى الإتصال بالإنترنت</string>
     <string name="data_uploaded">تم رفع البيانات بنجاح</string>
@@ -145,5 +152,54 @@
 
     <string name="save">حفظ</string>
     <string name="edit">تعديل</string>
+
+
+    <!-- Debt -->
+    <string name="add_new_customer">إضافة</string>
+    <string name="search">البحث</string>
+
+
+    <!-- bottom navigation bar -->
+
+    <string name="home">الصفحة الرئيسية</string>
+    <string name="Debt">الديون</string>
+    <string name="Account">حسابي</string>
+    <string name="More">المزيد</string>
+
+    <!-- login -->
+
+    <string name="login">تسجيل الدخول</string>
+    <string name="mobile">رقم الهاتف</string>
+    <string name="invalid_phone_no">قم بادخال رقم هاتف صحيح</string>
+
+    <!-- code verification -->
+
+    <string name="otp">رمز التحقق</string>
+    <string name="verification_code">رمز التحقق</string>
+    <string name="verification_text">لقد أرسلنا اليك رمز التحقق</string>
+
+    <!-- shop id -->
+
+    <string name="user_name">اسم المستخدم</string>
+    <string name="shop_id">الرقم التعريفى للمحل</string>
+
+    <!-- debt -->
+
+    <string name="for_you">ليك</string>
+    <string name="for_him">ليه</string>
+
+    <!-- are you sure dialog -->
+
+    <string name="are_you_sure_delete">هل انت متاكد من انك تريد حذف البيانات؟</string>
+    <string name="are_you_sure_add">هل انت متاكد من انك تريد اضافة وقت جديد؟</string>
+    <string name="are_you_sure_save">هل انت متاكد من انك تريد حفظ البيانات؟</string>
+
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+
+    <!-- change password -->
+    <string name="change_password">تغيير كلمة المرور</string>
+    <string name="password_confirmation">هل أنت متأكد من أنك تريد </string>
+    <string name="password_confirmation_1">كلمة مرور لحسابك؟</string>
 
 </resources>

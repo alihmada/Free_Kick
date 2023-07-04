@@ -17,4 +17,8 @@
     <color name="Gains_boro">#DBDBDB</color> <!-- light theme -->
     <color name="jet">#343434</color> <!-- dark theme -->
 
+
+    <color name="red">#FF0000</color>
+    <color name="green">#44FF00</color>
+
 </resources>

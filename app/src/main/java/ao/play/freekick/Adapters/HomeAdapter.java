@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -34,12 +33,16 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ao.play.freekick.Classes.Calculations;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
 import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
+import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Interfaces.ViewListener;
 import ao.play.freekick.Models.Common;
 import ao.play.freekick.Models.RevenueDeviceData;
@@ -47,8 +50,7 @@ import ao.play.freekick.R;
 import ao.play.freekick.Receivers.AlarmReceiver;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
-    public static HashMap<Integer, Handler> integerHandlerHashMap = new HashMap<>();
-    public static HashMap<Integer, Runnable> integerRunnableHashMap = new HashMap<>();
+    public static HashMap<Integer, Timer> integerTimerHashMap = new HashMap<>();
     List<Device> devices;
     Context context;
     ViewListener viewListener;
@@ -75,7 +77,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             if (devices.get(position).getHeader() != null) {
                 holder.header.setText(devices.get(position).getHeader());
             } else {
-                holder.header.setText(ViewHolder.headers[position]);
+                holder.header.setText(ViewHolder.HEADERS[position]);
             }
             holder.starting.setText(devices.get(position).getStartingTime());
             holder.spinner.setVisibility(devices.get(position).getSpinnerVisibility() == 0 ? View.VISIBLE : View.GONE);
@@ -89,7 +91,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             holder.payment.setChecked(devices.get(position).isPayment());
             if (devices.get(position).isRunning()) holder.calculate.performClick();
         } else {
-            holder.header.setText(ViewHolder.headers[position]);
+            holder.header.setText(ViewHolder.HEADERS[position]);
         }
     }
 
@@ -99,14 +101,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        public static String[] headers;
+        public static String[] HEADERS;
         SharedPreferences sharedPreferences;
         Context context;
         ViewListener viewListener;
         AlarmManager alarmManager;
         PendingIntent pendingIntent;
-        Handler handler;
-        Runnable runnable;
+        Timer timer;
+        TimerTask timerTask;
         Gson gson;
         TextView header, time, price;
         Spinner spinner;
@@ -129,6 +131,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             this.viewListener = viewListener;
 
+
             itemsDeclaration(); // items declaration
 
             methodsDeclaration(); // methods declaration
@@ -141,17 +144,37 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.starting_time_text) {
-                clickCounterForStarting = openTimePacker(starting, clickCounterForStarting);
+                clickCounterForStarting = openTimePicker(starting, clickCounterForStarting);
             } else if (v.getId() == R.id.ending_time_text) {
-                clickCounterForEnding = openTimePacker(ending, clickCounterForEnding);
+                clickCounterForEnding = openTimePicker(ending, clickCounterForEnding);
             } else if (v.getId() == R.id.delete) {
-                delete(headers[getAdapterPosition()]);
+                delete(HEADERS[getAdapterPosition()]);
             } else if (v.getId() == R.id.add) {
-                add();
+                ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_add), new ConfirmationDialog.ConfirmationDialogListener() {
+                    @Override
+                    public void onConfirm() {
+                        add();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
             } else if (v.getId() == R.id.history) {
                 history();
             } else if (v.getId() == R.id.save) {
-                save();
+                ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_save), new ConfirmationDialog.ConfirmationDialogListener() {
+                    @Override
+                    public void onConfirm() {
+                        save();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
             } else if (v.getId() == R.id.calculate) {
                 calculate();
             } else if (v.getId() == R.id.time) {
@@ -176,22 +199,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         private void itemsDeclaration() {
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            handler = new Handler();
-            runnable = new Runnable() {
-                @Override
-                public void run() {
-                    if (isOpenTime) openTime();
-                    else closedTime();
-                    handler.postDelayed(this, Common.TIME_INTERVAL);
-                }
-            };
 
             try {
                 sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
             } catch (Exception ignored) {
             }
 
-            headers = context.getResources().getStringArray(R.array.headers);
+            HEADERS = context.getResources().getStringArray(R.array.headers);
             gson = new Gson();
 
             header = itemView.findViewById(R.id.header);
@@ -274,7 +288,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             spinner.setSelection(0);
             if (payment.isChecked()) payment.setChecked(false);
             if (!solo.isChecked()) solo.setChecked(true);
-        } // End of starting()
+        }
 
         private void ending() {
             try {
@@ -284,13 +298,13 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     endingCustomInputHandler(DateAndTime.priceDependentTiming(String.valueOf(starting.getText()), Calculations.div(Calculations.mul(Double.parseDouble(String.valueOf(ending.getText())), 60), (solo.isChecked() ? 10 : 20))));
                 }
             } catch (Exception exception) {
-                if (String.valueOf(ending.getText()).equals(""))
+                if (String.valueOf(ending.getText()).equals("")) {
                     Toast.makeText(context, context.getString(R.string.ending_input_not_found), Toast.LENGTH_SHORT).show();
-                else
+                } else {
                     Toast.makeText(context, context.getString(R.string.starting_time_not_found), Toast.LENGTH_SHORT).show();
+                }
             }
-
-        } // End of ending()
+        }
 
         private void onTextChange() {
             starting.addTextChangedListener(new TextWatcher() {
@@ -302,15 +316,14 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 @Override
                 public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
                     if (timeFormatMatcher(String.valueOf(charSequence))) {
-
                         spinner.setVisibility(View.VISIBLE);
                         spinner.setSelection(0);
 
                         storeData();
 
-                        if (String.valueOf(ending.getText()).equals(""))
+                        if (String.valueOf(ending.getText()).equals("")) {
                             calculate.setText(context.getString(R.string.start));
-                        else if (timeFormatMatcher(String.valueOf(ending.getText()))) {
+                        } else if (timeFormatMatcher(String.valueOf(ending.getText()))) {
                             if (DateAndTime.timeConverter(String.valueOf(charSequence)).isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText()))) && LocalDateTime.now().isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText())))) {
                                 calculate.setText(context.getString(R.string.timer));
                             } else {
@@ -321,7 +334,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                         }
                         startingLayout.setErrorEnabled(false);
                     } else if (String.valueOf(charSequence).equals("")) {
-
                         calculate.setText(context.getString(R.string.calculate));
                         spinner.setVisibility(View.GONE);
 
@@ -335,10 +347,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    shutdownHandler();
+                    shutdownTimer();
                     shutdownAlarm();
                 }
-            }); // End of starting.addTextChangedListener()
+            });
 
             ending.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -353,53 +365,54 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    shutdownHandler();
+                    shutdownTimer();
                     shutdownAlarm();
                 }
-            }); // End of ending.addTextChangedListener()
-
-        } // End of onTextChange()
+            });
+        }
 
         private boolean timeMatcher(String text) {
             return text.matches("^(0?[0-9]|1[0-9]|2[0-3]):(0?[0-9]|[1-5][0-9])$");
-        } // End of timeMatcher()
+        }
 
         private boolean timeFormatMatcher(String text) {
             return text.matches("^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[012])-((19|20)\\d\\d) (0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] (AM|am|PM|pm|ص|م)$");
-        } // End of timeFormatMatcher()
+        }
 
         private boolean priceMatcher(String text) {
-            return text.matches("^\\d{1,3}$");
-        } // End of priceMatcher()
+            return text.matches("\\d+(\\.\\d+)?");
+        }
 
         private void endingCustomInputHandler(String time) {
             ending.setText(time);
             viewListener.vibration(5); // viewListener.vibrationEffect.EFFECT_HEAVY_CLICK
             spinner.setSelection(9);
-        } // End of endingCustomInputHandler()
+        }
 
         private void endingOnTextChange(CharSequence charSequence) {
             endingInputTextChecker(charSequence);
             if (String.valueOf(charSequence).equals("")) {
                 spinner.setSelection(0);
-                if (timeFormatMatcher(String.valueOf(starting.getText())))
+                if (timeFormatMatcher(String.valueOf(starting.getText()))) {
                     calculate.setText(context.getString(R.string.start));
+                }
             } else if (charSequence.charAt(0) == ' ' && charSequence.length() == 1) {
                 ending.setText(DateAndTime.getCurrentTime());
                 viewListener.vibration(0); // viewListener.vibrationEffect.EFFECT_CLICK
                 spinner.setSelection(9);
             }
-        } // End of endingOnTextChange()
+        }
 
         private void endingInputTextChecker(CharSequence charSequence) {
             if (timeFormatMatcher(String.valueOf(charSequence)) || String.valueOf(ending.getText()).equals("")) {
-
                 storeData();
 
                 if (timeFormatMatcher(String.valueOf(charSequence))) {
-                    if (LocalDateTime.now().isBefore(DateAndTime.timeConverter(String.valueOf(charSequence))))
+                    if (LocalDateTime.now().isBefore(DateAndTime.timeConverter(String.valueOf(charSequence)))) {
                         calculate.setText(context.getString(R.string.timer));
-                    else calculate.setText(context.getString(R.string.calculate));
+                    } else {
+                        calculate.setText(context.getString(R.string.calculate));
+                    }
                 }
                 endingLayout.setErrorEnabled(false);
                 endingLayout.setHelperTextEnabled(false);
@@ -410,9 +423,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             } else {
                 endingLayout.setError(context.getString(R.string.invalid_time_format));
             }
-        } // End of endingInputTextChecker()
+        }
 
-        private int openTimePacker(TextInputEditText inputEditText, int clickCount) {
+        private int openTimePicker(TextInputEditText inputEditText, int clickCount) {
             clickCount++;
             if (doubleClick + Common.TIME_INTERVAL > System.currentTimeMillis()) {
                 if (clickCount == 2) {
@@ -426,17 +439,17 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             doubleClick = System.currentTimeMillis();
             return clickCount;
-        } // End of openTimePacker()
+        }
 
         private void delete(String head) {
 
             clickCounterForCalculate = 0;
             isOpenTime = false;
 
-            pushToHistory();
+            if (!Objects.equals(String.valueOf(starting.getText()), "")) pushToHistory();
 
             viewListener.vibration(0); // viewListener.vibrationEffect.EFFECT_CLICK
-            shutdownHandler();
+            shutdownTimer();
             shutdownAlarm();
             header.setText(head);
             spinner.setSelection(0);
@@ -489,7 +502,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             if (data != null && data.getStartingTime() != null && !data.getStartingTime().equals("")) {
                 if (data.getHeader() != null) header.setText(data.getHeader());
-                else header.setText(headers[getAdapterPosition()]);
+                else header.setText(HEADERS[getAdapterPosition()]);
                 starting.setText(data.getStartingTime());
                 spinner.setVisibility(data.getSpinnerVisibility() == 8 ? View.GONE : View.VISIBLE);
                 spinner.setSelection(data.getSpinnerIndex());
@@ -505,80 +518,90 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         private void save() {
             viewListener.vibration(0); // viewListener.vibrationEffect.EFFECT_CLICK
             if (!String.valueOf(starting.getText()).equals("") && !String.valueOf(time.getText()).equals(context.getString(R.string.time))) {
-                Firebase.save(String.valueOf(getAdapterPosition() + 1), getDeviceInstance(), context);
+                Firebase.save(String.valueOf(getAdapterPosition() + 1), getRevenueDeviceDataInstance(), context);
             } else
                 Toast.makeText(context, context.getString(R.string.save_message_when_device_empty), Toast.LENGTH_SHORT).show();
 
         } // End of save()
 
-        private RevenueDeviceData getDeviceInstance() {
+        private RevenueDeviceData getRevenueDeviceDataInstance() {
             Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()).equals("") ? DateAndTime.getCurrentTime() : String.valueOf(ending.getText()));
-            return new RevenueDeviceData(languageHandler(String.valueOf(starting.getText())), String.valueOf(ending.getText()).equals("") ? languageHandler(DateAndTime.getCurrentTime()) : languageHandler(String.valueOf(ending.getText())), solo.isChecked() ? "Solo" : "Multi", DateAndTime.durationToClockFormat(duration), Calculations.priceCalculator(solo.isChecked(), duration));
+            return new RevenueDeviceData(languageHandler(String.valueOf(starting.getText())), String.valueOf(ending.getText()).equals("") ? languageHandler(DateAndTime.getCurrentTime()) : languageHandler(String.valueOf(ending.getText())), solo.isChecked() ? "Solo" : "Multi", DateAndTime.durationToClockFormat(duration), Calculations.round(Calculations.priceCalculator(solo.isChecked(), duration)));
         } // End of getDeviceInstance() -> save open time
 
         private void calculate() {
             viewListener.vibration(0); // viewListener.vibrationEffect.EFFECT_CLICK
-            if (timeFormatMatcher(String.valueOf(starting.getText())) && timeFormatMatcher(String.valueOf(ending.getText())) && DateAndTime.timeConverter(String.valueOf(starting.getText())).isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText()))) && LocalDateTime.now().isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText())))) {
 
-                scheduleAlarm(DateAndTime.timeExtractor(String.valueOf(ending.getText())));
+            timer = new Timer();
+            timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    if (isOpenTime) openTime();
+                    else closedTime();
+                }
+            };
+
+            String startingText = String.valueOf(starting.getText());
+            String endingText = String.valueOf(ending.getText());
+
+            if (timeFormatMatcher(startingText) && timeFormatMatcher(endingText) && DateAndTime.timeConverter(startingText).isBefore(DateAndTime.timeConverter(endingText)) && LocalDateTime.now().isBefore(DateAndTime.timeConverter(endingText))) {
+
+                scheduleAlarm(DateAndTime.timeExtractor(endingText));
 
                 timeOutOfRange();
+                fullDuration = DateAndTime.timeDifference(startingText, endingText);
 
-                fullDuration = DateAndTime.timeDifference(String.valueOf(starting.getText()),
-                        String.valueOf(ending.getText()));
-
-                handler.postDelayed(runnable, Common.POST_DELAYED);
-
+                timer.scheduleAtFixedRate(timerTask, 1000, 500);
                 Toast.makeText(context, context.getString(R.string.timer_running), Toast.LENGTH_SHORT).show();
 
                 running = true;
-
                 storeData();
 
-                integerHandlerHashMap.put(getAdapterPosition(), handler);
-                integerRunnableHashMap.put(getAdapterPosition(), runnable);
+                integerTimerHashMap.put(getAdapterPosition(), timer);
 
-            } else if (timeFormatMatcher(String.valueOf(starting.getText())) && timeFormatMatcher(String.valueOf(ending.getText())) && DateAndTime.timeConverter(String.valueOf(starting.getText())).isBefore(DateAndTime.timeConverter(String.valueOf(ending.getText()))) && LocalDateTime.now().isAfter(DateAndTime.timeConverter(String.valueOf(ending.getText())))) {
+            } else if (timeFormatMatcher(startingText) && timeFormatMatcher(endingText) && DateAndTime.timeConverter(startingText).isBefore(DateAndTime.timeConverter(endingText)) && LocalDateTime.now().isAfter(DateAndTime.timeConverter(endingText))) {
 
                 timeOutOfRange();
 
-            } else if (timeFormatMatcher(String.valueOf(starting.getText())) && String.valueOf(ending.getText()).equals("")) {
-
+            } else if (timeFormatMatcher(startingText) && endingText.equals("")) {
                 isOpenTime = true;
 
                 if (Calculations.isEven(clickCounterForCalculate)) {
                     calculate.setText(context.getString(R.string.stop));
-
-                    handler.postDelayed(runnable, Common.POST_DELAYED);
-
+                    timer.scheduleAtFixedRate(timerTask, 0, 1000);
                     Toast.makeText(context, context.getString(R.string.open_time_running), Toast.LENGTH_SHORT).show();
-
                     running = true;
-
                     storeData();
                 } else {
-                    calculate.setText(context.getString(R.string.calculate));
-                    ending.setText(DateAndTime.getCurrentTime());
-                    shutdownHandler();
-                    Toast.makeText(context, context.getString(R.string.open_time_off), Toast.LENGTH_SHORT).show();
+                    ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_calculate), new ConfirmationDialog.ConfirmationDialogListener() {
+                        @Override
+                        public void onConfirm() {
+                            calculate.setText(context.getString(R.string.calculate));
+                            ending.setText(DateAndTime.getCurrentTime());
+                            shutdownTimer();
+                            Toast.makeText(context, context.getString(R.string.open_time_off), Toast.LENGTH_SHORT).show();
+                            storeData();
+                            Firebase.save(String.valueOf(getAdapterPosition() + 1), getRevenueDeviceDataInstance(), context);
+                        }
 
-                    storeData();
-
-                    Firebase.save(String.valueOf(getAdapterPosition() + 1), getDeviceInstance(), context);
+                        @Override
+                        public void onCancel() {
+                            clickCounterForCalculate--;
+                        }
+                    });
                 }
                 clickCounterForCalculate++;
+
             } else {
                 Toast.makeText(context, context.getString(R.string.check_for_data), Toast.LENGTH_SHORT).show();
             }
-
-        } // End of calculate()
+        }
 
         private void openTime() {
             currentDuration = DateAndTime.timeDifference(String.valueOf(starting.getText()));
-
             time.setText(DateAndTime.durationToClockFormat(currentDuration));
             price.setText(Calculations.priceCalculator(solo.isChecked(), currentDuration));
-        } // End of openTime()
+        }
 
         private void closedTime() {
             if (isForward) {
@@ -590,7 +613,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             } else {
                 openTime();
             }
-        } // End of closedTime()
+        }
 
         private void timeOutOfRange() {
             isOpenTime = false;
@@ -598,22 +621,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             time.setText(DateAndTime.durationToClockFormat(duration));
             price.setText(Calculations.priceCalculator(solo.isChecked(), duration));
-        } // End of timeOutRange()
+        }
 
         private void scheduleAlarm(int[] time) {
-
             Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()));
             String price = Calculations.priceCalculator(solo.isChecked(), duration);
 
             Intent intent = new Intent(context, AlarmReceiver.class);
 
             intent.putExtra(Common.NOTIFICATION_CONTENT, context.getString(R.string.notification_content).concat(String.format("\n%s %s", context.getString(R.string.required_to_be_paid), price)));
-            intent.putExtra(Common.NOTIFICATION_TITLE, String.format("%s %s", headers[getAdapterPosition()], context.getString(R.string.notification_title)));
-            intent.putExtra(Common.DEVICE_NUMBER, String.valueOf(getAdapterPosition() + 1));
-            intent.putExtra(Common.SHARED_PREFERENCES_KEY, String.valueOf(getAdapterPosition()));
-            intent.putExtra(Common.THREAD_POSITION, getAdapterPosition());
+            intent.putExtra(Common.NOTIFICATION_TITLE, String.format("%s %s", HEADERS[getAdapterPosition()], context.getString(R.string.notification_title)));
+            intent.putExtra(Common.ITEM_POSITION, getAdapterPosition());
 
-            sharedPreferences.edit().putString(String.format("d%s", getAdapterPosition()), gson.toJson(getDeviceInstance())).apply();
+            sharedPreferences.edit().putString(Common.REVENUE.concat(String.valueOf(getAdapterPosition())), gson.toJson(getRevenueDeviceDataInstance())).apply();
 
             pendingIntent = PendingIntent.getBroadcast(context, getAdapterPosition(), intent, PendingIntent.FLAG_IMMUTABLE);
 
@@ -628,35 +648,44 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             }
 
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        } // End of scheduleAlarm()
+        }
 
         private void shutdownAlarm() {
             if (pendingIntent != null) {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent = null;
             }
-        } // End of shutdownAlarm()
+        }
 
-        private void shutdownHandler() {
+        private void shutdownTimer() {
             try {
-                handler.removeCallbacks(runnable);
+                if (isOpenTime) clickCounterForCalculate = 0;
+                if (timer != null) timer.cancel();
                 running = false;
                 storeData();
             } catch (Exception ignored) {
             }
-        } // End of shutdownHandler()
+        }
 
         private void storeData() {
-            sharedPreferences.edit().putString(String.valueOf(getAdapterPosition()), gson.toJson(new Device(header.getText().toString(), String.valueOf(starting.getText()), String.valueOf(ending.getText()), spinner.getVisibility(), spinner.getSelectedItemPosition(), solo.isChecked(), payment.isChecked(), running))).apply();
-        } // End of storeData()
+            sharedPreferences.edit().putString(String.valueOf(getAdapterPosition()), getJsonDevice()).apply();
+        }
 
         private void pushToHistory() {
-            sharedPreferences.edit().putString(String.format("h%s", getAdapterPosition()), gson.toJson(new Device(header.getText().toString(), String.valueOf(starting.getText()), String.valueOf(ending.getText()), spinner.getVisibility(), spinner.getSelectedItemPosition(), solo.isChecked(), payment.isChecked(), running))).apply();
-        } // End of pushToHistory()
+            sharedPreferences.edit().putString(getHistoryKey(), getJsonDevice()).apply();
+        }
 
         private Device getDataFromHistory() {
-            return gson.fromJson(sharedPreferences.getString(String.format("h%s", getAdapterPosition()), ""), Device.class);
-        } // End of getDataFromHistory()
+            return gson.fromJson(sharedPreferences.getString(getHistoryKey(), ""), Device.class);
+        }
+
+        private String getHistoryKey() {
+            return Common.HISTORY.concat(String.valueOf(getAdapterPosition()));
+        }
+
+        private String getJsonDevice() {
+            return gson.toJson(new Device(header.getText().toString(), String.valueOf(starting.getText()), String.valueOf(ending.getText()), spinner.getVisibility(), spinner.getSelectedItemPosition(), solo.isChecked(), payment.isChecked(), running));
+        }
 
         private String languageHandler(String text) {
             if (text.contains("م") || text.contains("ص")) {

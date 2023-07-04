@@ -7,6 +7,8 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -28,6 +30,18 @@
         android:theme="@style/Theme.FreeKick"
         tools:targetApi="32">
         <activity
+            android:name=".Activities.DebtDetails"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.ShopID"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.CodeVerification"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.Login"
+            android:exported="false" />
+        <activity
             android:name=".Activities.Controllers"
             android:exported="false" />
         <activity
@@ -38,7 +52,15 @@
             android:name=".Receivers.AlarmReceiver"
             android:enabled="true" />
 
-        <service android:name=".Services.VibrationNotificationService" />
+        <receiver
+            android:name=".Receivers.PasswordRemovalReceiver"
+            android:enabled="true" />
+
+        <service
+            android:name=".Services.VibrationNotificationService"
+            android:enabled="true"
+            android:exported="false" />
+
         <service android:name=".Services.PasswordRemovalService" />
 
         <activity
@@ -47,7 +69,7 @@
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme" />
         <activity
-            android:name=".Activities.Home"
+            android:name=".Activities.Main"
             android:exported="false" />
         <activity
             android:name=".Activities.Splash"

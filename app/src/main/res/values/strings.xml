@@ -23,6 +23,10 @@
     <string name="open_time_off">Open time is turned off</string>
     <string name="timer_running">Timer is running</string>
 
+    <!-- calculate dialog -->
+
+    <string name="are_you_sure_calculate">Are you sure, you want stop timer and sava data?</string>
+
     <!-- edit text place holder -->
 
     <string name="placeHolderText">Enter a time</string>
@@ -42,6 +46,7 @@
     <string name="third_device">Third Device</string>
     <string name="fourth_device">Fourth Device</string>
 
+    <string name="delete">Delete</string>
     <string name="delete_all">Remove all data</string>
     <string name="exit">Exit</string>
 
@@ -64,15 +69,18 @@
     </string-array>
 
     <!-- not found error messages -->
+
     <string name="starting_time_not_found">Please, Enter a starting time</string>
     <string name="ending_input_not_found">Please, Enter a custom time or a custom price</string>
 
     <!-- ending text error and helper -->
+
     <string name="invalid_time_format">Please, check for time format</string>
     <string name="time_price_match_helper">Please, long press to handle the</string>
 
 
-    <!-- headers -->
+    <!-- HEADERS -->
+
     <string-array name="headers">
         <item>@string/first_device</item>
         <item>@string/second_device</item>
@@ -81,44 +89,59 @@
     </string-array>
 
     <!-- adding error message -->
+
     <string name="check_for_data">Please, check for your data and try again</string>
 
     <!-- history -->
+
     <string name="empty_history">Empty history</string>
 
     <!-- error_in_inputs -->
+
     <string name="error_in_inputs">Please, check your inputs</string>
 
     <!-- save -->
+
     <string name="save_message_when_device_empty">Can not save, please check your inputs</string>
 
     <!-- notifications -->
+
     <string name="notification_content">The device must be evacuated</string>
     <string name="notification_title">is finished</string>
     <string name="required_to_be_paid">Required to be paid is</string>
 
     <!-- Scanner -->
+
     <string name="scan">Scan a QR Code</string>
 
     <!-- on back press -->
+
     <string name="tap_again">Tap again to exit app</string>
 
     <!-- password dialog -->
+
     <string name="password">Enter your password</string>
     <string name="submit">Submit</string>
     <string name="use_your_fingerprint">Use your fingerprint</string>
     <string name="free_kick_verify">Free kick needs to verify it\'s you</string>
     <string name="cancel">Cancel</string>
 
+    <!-- customer name -->
+
+    <string name="customer_name">Enter value</string>
+
     <!-- progress dialog -->
+
     <string name="loading">Loading…</string>
 
     <!-- internet -->
+
     <string name="no_internet">No internet connection</string>
     <string name="data_uploaded">Data uploaded</string>
     <string name="data_download">Downloaded successfully</string>
 
     <!-- revenue -->
+
     <string name="years">Years</string>
     <string name="months">Months</string>
     <string name="days">Days</string>
@@ -126,6 +149,7 @@
     <string name="device_number">Device number</string>
 
     <!-- saved -->
+
     <string name="saved">Saved</string>
 
 
@@ -152,5 +176,51 @@
 
     <string name="save">Save</string>
     <string name="edit">Edit</string>
+
+    <!-- Debt -->
+
+    <string name="add_new_customer">Add new one</string>
+    <string name="search">Search</string>
+
+
+    <!-- bottom navigation bar -->
+
+    <string name="home">Home</string>
+    <string name="Debt">Debt</string>
+    <string name="Account">My account</string>
+    <string name="More">More</string>
+
+
+    <!-- login -->
+    <string name="login">Login</string>
+    <string name="mobile">Mobile No.</string>
+    <string name="invalid_phone_no">Please, Enter a valid phone number</string>
+
+    <!-- code verification -->
+    <string name="otp">OTP</string>
+    <string name="verification_code">Verification code</string>
+    <string name="verification_text">We have sent the code verification</string>
+
+    <!-- shop id -->
+    <string name="user_name">User Name</string>
+    <string name="shop_id">Shop ID</string>
+
+    <!-- debt -->
+    <string name="for_him">For him</string>
+    <string name="for_you">For you</string>
+
+
+    <!-- are you sure dialog -->
+    <string name="are_you_sure_delete">Are you sure, you want delete data?</string>
+    <string name="are_you_sure_save">Are you sure, you want save data?</string>
+    <string name="are_you_sure_add">Are you sure, you want add a new time?</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <!-- change password -->
+    <string name="change_password">Change password</string>
+    <string name="password_confirmation">Are you sure want </string>
+    <string name="password_confirmation_1">password for your account?</string>
 
 </resources>

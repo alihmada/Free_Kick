@@ -5,6 +5,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,8 +25,12 @@ import ao.play.freekick.Models.RevenueDeviceData;
 import ao.play.freekick.R;
 
 public class Firebase {
+    public static FirebaseDatabase getInstance() {
+        return FirebaseDatabase.getInstance();
+    } // End getInstance()
+
     public static DatabaseReference getRoot() {
-        return FirebaseDatabase.getInstance().getReference(Common.ROOT);
+        return getInstance().getReference(Common.ROOT);
     } // End getRoot()
 
     public static DatabaseReference getDatabase() {
@@ -67,6 +73,22 @@ public class Firebase {
         return getRoot().child(Common.CONTROLLERS);
     } // End getController()
 
+    public static DatabaseReference getDebt() {
+        return getRoot().child(Common.DEBT);
+    } // End of getDebt()
+
+    public static FirebaseAuth getFirebaseAuth() {
+        return FirebaseAuth.getInstance();
+    } // End of getFirebaseAuth()
+
+    public static FirebaseUser getCurrentUser() {
+        return getFirebaseAuth().getCurrentUser();
+    } // End of getCurrentUser()
+
+    public static String getPhoneNumber() {
+        return getCurrentUser().getPhoneNumber();
+    } // End of getPhoneNumber()
+
     public static void upload(Device[] data, Context context) {
         Loading.showProgressDialog();
         if (!Internet.isConnected(context)) Loading.dismissProgressDialog();
@@ -94,6 +116,52 @@ public class Firebase {
 
         Internet.isConnected(context);
 
+        if (DateAndTime.isSpanningMultipleDays(revenueDeviceData.getStart(), revenueDeviceData.getEnd())) {
+
+            String[] date = DateAndTime.getYesterday();
+
+            DatabaseReference year = getYear(date[2]);
+
+            DatabaseReference month = getMonth(year, date[1]);
+
+            DatabaseReference day = getDay(month, date[0]);
+
+            DatabaseReference device = getDevice(day, deviceNumber);
+
+            Query query = device.orderByChild("start").equalTo(revenueDeviceData.getStart());
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        RevenueDeviceData deviceData;
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            deviceData = dataSnapshot.getValue(RevenueDeviceData.class);
+                            dataSnapshot.getRef().removeValue();
+
+                            assert deviceData != null;
+                            deletePrice(device.child(Common.PRICE), deviceData.getPrice());
+                            deleteDuration(device.child(Common.DURATION), deviceData.getTime());
+
+                            deletePrice(day.child(Common.PRICE), deviceData.getPrice());
+                            deleteDuration(day.child(Common.DURATION), deviceData.getTime());
+
+                            deletePrice(month.child(Common.PRICE), deviceData.getPrice());
+                            deleteDuration(month.child(Common.DURATION), deviceData.getTime());
+
+                            deletePrice(year.child(Common.PRICE), deviceData.getPrice());
+                            deleteDuration(year.child(Common.DURATION), deviceData.getTime());
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
         DatabaseReference year = getYear(DateAndTime.getYear());
 
         year.child(Common.NUMBER).setValue(DateAndTime.getYear());
@@ -117,6 +185,12 @@ public class Firebase {
         DatabaseReference device = getDevice(day, deviceNumber);
 
         queryGetStarting(year, month, day, device, deviceNumber, revenueDeviceData, context);
+//        } else {
+//            try (Database database = new Database(context)) {
+//                database.pushItem(DateAndTime.getYear(), DateAndTime.getMonth(), DateAndTime.getDay(), deviceNumber, gson.toJson(revenueDeviceData));
+//            } catch (Exception ignored) {
+//            }
+        //}
     } //End save()
 
     private static void queryGetStarting(DatabaseReference year, DatabaseReference month, DatabaseReference day, DatabaseReference device, String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
@@ -223,7 +297,7 @@ public class Firebase {
                 if (snapshot.exists()) {
                     currentValue = String.valueOf(snapshot.getValue());
                 }
-                String updatedValue = DateAndTime.durationPlus(currentValue, DateAndTime.timeDifference(Firebase.languageHandler(revenueDeviceData.getStart()), Firebase.languageHandler(revenueDeviceData.getEnd())).toString());
+                String updatedValue = DateAndTime.durationPlus(currentValue, DateAndTime.timeDifference(languageHandler(revenueDeviceData.getStart()), languageHandler(revenueDeviceData.getEnd())).toString());
                 ref.setValue(updatedValue);
             }
 
@@ -238,7 +312,7 @@ public class Firebase {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.timeDifference(Firebase.languageHandler(previousRevenueDeviceData.getStart()), Firebase.languageHandler(previousRevenueDeviceData.getEnd())).toString());
+                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.timeDifference(languageHandler(previousRevenueDeviceData.getStart()), languageHandler(previousRevenueDeviceData.getEnd())).toString());
                 ref.setValue(updatedValue).addOnSuccessListener(unused -> updateDuration(ref, currentRevenueDeviceData));
             }
 
@@ -248,6 +322,36 @@ public class Firebase {
             }
         });
     } // End updateDurationInDelete()
+
+    public static void deletePrice(DatabaseReference ref, String price) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                double updatedValue = Double.parseDouble(String.valueOf(snapshot.getValue())) - Double.parseDouble(price);
+                ref.setValue(updatedValue);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }// End deletePrice()
+
+    public static void deleteDuration(DatabaseReference ref, String time) {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.convertToDuration(time));
+                ref.setValue(updatedValue);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }// End deleteDuration()
 
     public static String languageHandler(String text) {
         if (text.contains("م") || text.contains("ص")) {

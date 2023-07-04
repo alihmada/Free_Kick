@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
-import java.util.Objects;
+import java.util.Timer;
 
 import ao.play.freekick.Adapters.HomeAdapter;
+import ao.play.freekick.Classes.Calculations;
 import ao.play.freekick.Classes.Device;
 import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
@@ -22,54 +25,103 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         new Thread(() -> {
-            Gson gson = new Gson();
-            SharedPreferences sharedPreferences = getDecryptedSharedPreferences(context);
+            try {
+                FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+                Gson gson = new Gson();
 
-            Intent serviceIntent = new Intent(context, VibrationNotificationService.class);
-            serviceIntent.putExtra(Common.NOTIFICATION_TITLE, intent.getStringExtra(Common.NOTIFICATION_TITLE));
-            serviceIntent.putExtra(Common.NOTIFICATION_CONTENT, intent.getStringExtra(Common.NOTIFICATION_CONTENT));
-            context.startForegroundService(serviceIntent);
+                startVibrationNotificationService(context, intent);
 
-            int position = intent.getIntExtra(Common.THREAD_POSITION, -1);
-            removeCallbacks(position);
+                int position = intent.getIntExtra(Common.ITEM_POSITION, -1);
+                removeCallbacks(position);
 
-            String revenue = sharedPreferences.getString(getSharedPreferenceKey(position), "");
-            RevenueDeviceData revenueDeviceData = gson.fromJson(revenue, RevenueDeviceData.class);
-            Firebase.save(intent.getStringExtra(Common.DEVICE_NUMBER), revenueDeviceData, context);
+                SharedPreferences sharedPreferences = getDecryptedSharedPreferences(context);
+                if (sharedPreferences != null) {
+                    String revenueKey = getSharedPreferenceKey(position);
 
-            sharedPreferences.edit().remove(Common.RANDOM_KEY).apply();
-            Device device = gson.fromJson(sharedPreferences.getString(getSharedPreferenceKey(intent.getStringExtra(Common.SHARED_PREFERENCES_KEY)), ""), Device.class);
-            device.setRunning(false);
-            sharedPreferences.edit().putString(getNewSharedPreferenceKey(intent.getStringExtra(Common.SHARED_PREFERENCES_KEY)), gson.toJson(device)).remove(intent.getStringExtra(Common.SHARED_PREFERENCES_KEY)).apply();
+                    String revenue = sharedPreferences.getString(revenueKey, "");
+                    RevenueDeviceData revenueDeviceData = parseRevenueData(revenue, crashlytics, gson);
+
+                    if (revenueDeviceData != null) {
+                        saveRevenueData(String.valueOf(Calculations.sum(position, 1)), revenueDeviceData, context);
+                    }
+
+                    transferDeviceDataToHistory(sharedPreferences, gson, String.valueOf(position));
+                }
+            } catch (Exception e) {
+                FirebaseCrashlytics.getInstance().recordException(e);
+            }
         }).start();
     }
 
     private SharedPreferences getDecryptedSharedPreferences(Context context) {
-        SharedPreferences sharedPreferences = null;
         try {
-            sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
-        } catch (Exception ignored) {
+            return context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
-        return sharedPreferences;
+        return null;
+    }
+
+    private void startVibrationNotificationService(Context context, Intent intent) {
+        Intent serviceIntent = new Intent(context, VibrationNotificationService.class);
+        serviceIntent.putExtra(Common.NOTIFICATION_TITLE, intent.getStringExtra(Common.NOTIFICATION_TITLE));
+        serviceIntent.putExtra(Common.NOTIFICATION_CONTENT, intent.getStringExtra(Common.NOTIFICATION_CONTENT));
+        context.startForegroundService(serviceIntent);
     }
 
     private void removeCallbacks(int position) {
         try {
-            Objects.requireNonNull(HomeAdapter.integerHandlerHashMap.get(position))
-                    .removeCallbacks(HomeAdapter.integerRunnableHashMap.get(position));
-        } catch (Exception ignored) {
+            Timer timer = HomeAdapter.integerTimerHashMap.get(position);
+            if (timer != null) {
+                timer.cancel();
+            }
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
     private String getSharedPreferenceKey(int position) {
-        return String.format("d%s", position);
+        return Common.REVENUE.concat(String.valueOf(position));
     }
 
-    private String getSharedPreferenceKey(String position) {
-        return String.format("d%s", position);
+    private RevenueDeviceData parseRevenueData(String revenue, FirebaseCrashlytics crashlytics, Gson gson) {
+        RevenueDeviceData revenueDeviceData = null;
+        try {
+            revenueDeviceData = gson.fromJson(revenue, RevenueDeviceData.class);
+        } catch (JsonSyntaxException e) {
+            crashlytics.recordException(e);
+        }
+        return revenueDeviceData;
     }
 
-    private String getNewSharedPreferenceKey(String oldKey) {
-        return String.format("h%s", oldKey);
+    private void saveRevenueData(String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
+        Firebase.save(deviceNumber, revenueDeviceData, context);
+    }
+
+    private void transferDeviceDataToHistory(SharedPreferences sharedPreferences, Gson gson, String sharedPrefsKey) {
+        String deviceJson = sharedPreferences.getString(sharedPrefsKey, "");
+        Device device = parseDeviceData(deviceJson, gson, FirebaseCrashlytics.getInstance());
+
+        if (device != null) {
+            device.setRunning(false);
+
+            String preferenceHistoryKey = getSharedPreferenceHistoryKey(sharedPrefsKey);
+            sharedPreferences.edit().putString(preferenceHistoryKey, gson.toJson(device)).apply();
+        }
+        sharedPreferences.edit().remove(sharedPrefsKey).apply();
+    }
+
+    private Device parseDeviceData(String deviceJson, Gson gson, FirebaseCrashlytics crashlytics) {
+        Device device = null;
+        try {
+            device = gson.fromJson(deviceJson, Device.class);
+        } catch (JsonSyntaxException e) {
+            crashlytics.recordException(e);
+        }
+        return device;
+    }
+
+    private String getSharedPreferenceHistoryKey(String position) {
+        return Common.HISTORY.concat(position);
     }
 }

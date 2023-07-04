@@ -18,8 +18,8 @@ import ao.play.freekick.R;
 
 public class MonthsAndDaysAdapter extends RecyclerView.Adapter<MonthsAndDaysAdapter.ViewHolder> {
 
-    List<MonthAndDay> monthAndDays;
-    ViewOnClickListener viewOnClickListener;
+    private final List<MonthAndDay> monthAndDays;
+    private final ViewOnClickListener viewOnClickListener;
 
     public MonthsAndDaysAdapter(List<MonthAndDay> monthAndDays, ViewOnClickListener viewOnClickListener) {
         this.monthAndDays = monthAndDays;
@@ -35,17 +35,24 @@ public class MonthsAndDaysAdapter extends RecyclerView.Adapter<MonthsAndDaysAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.number.setText(monthAndDays.get(position).getNumber());
-        holder.name.setText(Locale.getDefault().getLanguage().equals("en")
-                ? monthAndDays.get(position).getEnglish_name()
-                : monthAndDays.get(position).getArabic_name());
-        holder.time.setText(DateAndTime.durationToClockFormat(monthAndDays.get(position).getDuration()));
-        holder.price.setText(String.valueOf(monthAndDays.get(position).getPrice()));
+        MonthAndDay item = monthAndDays.get(position);
+        holder.number.setText(item.getNumber());
+        holder.name.setText(getMonthDisplayName(item));
+        holder.time.setText(DateAndTime.durationToClockFormat(item.getDuration()));
+        holder.price.setText(String.valueOf(item.getPrice()));
     }
 
     @Override
     public int getItemCount() {
         return monthAndDays.size();
+    }
+
+    private String getMonthDisplayName(MonthAndDay item) {
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            return item.getEnglish_name();
+        } else {
+            return item.getArabic_name();
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -54,7 +61,6 @@ public class MonthsAndDaysAdapter extends RecyclerView.Adapter<MonthsAndDaysAdap
 
         public ViewHolder(@NonNull View itemView, ViewOnClickListener viewOnClickListener) {
             super(itemView);
-
             number = itemView.findViewById(R.id.number);
             name = itemView.findViewById(R.id.name);
             time = itemView.findViewById(R.id.time);

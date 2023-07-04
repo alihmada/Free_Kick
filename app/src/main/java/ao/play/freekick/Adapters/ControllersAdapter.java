@@ -21,46 +21,47 @@ import ao.play.freekick.R;
 
 public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.ViewHolder> {
 
-    List<Controller> controllerList;
+    private final List<Controller> controllerList;
 
     public ControllersAdapter(List<Controller> controllerList) {
         this.controllerList = controllerList;
-    } // End of ControllersAdapter()
+    }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.controller_row, parent, false);
         return new ViewHolder(view);
-    } // End of onCreateViewHolder()
+    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.id.setText(controllerList.get(position).getId());
-        holder.timeOfLastRepair.setText(controllerList.get(position).getTimeOfLastRepair());
-        holder.body.setText(controllerList.get(position).getBody());
-        holder.rightAnalog.setText(controllerList.get(position).getRightAnalog());
-        holder.leftAnalog.setText(controllerList.get(position).getLeftAnalog());
-        holder.buttons.setText(controllerList.get(position).getXo());
-        holder.stock.setText(controllerList.get(position).getStock());
-        holder.option.setText(controllerList.get(position).getOption());
-        holder.share.setText(controllerList.get(position).getShare());
-        holder.table.setText(controllerList.get(position).getTable());
-        holder.r1r2.setText(controllerList.get(position).getR1r2());
-        holder.l1l2.setText(controllerList.get(position).getL1l2());
-        holder.socket.setText(controllerList.get(position).getSocket());
-        holder.battery.setText(controllerList.get(position).getBattery());
-        holder.innerCable.setText(controllerList.get(position).getInnerCable());
-        holder.motherboard.setText(controllerList.get(position).getMotherboard());
-    } // End of onBindViewHolder()
+        Controller controller = controllerList.get(position);
+
+        holder.id.setText(controller.getId());
+        holder.timeOfLastRepair.setText(controller.getTimeOfLastRepair());
+        holder.body.setText(controller.getBody());
+        holder.rightAnalog.setText(controller.getRightAnalog());
+        holder.leftAnalog.setText(controller.getLeftAnalog());
+        holder.buttons.setText(controller.getXo());
+        holder.stock.setText(controller.getStock());
+        holder.option.setText(controller.getOption());
+        holder.share.setText(controller.getShare());
+        holder.table.setText(controller.getTable());
+        holder.r1r2.setText(controller.getR1r2());
+        holder.l1l2.setText(controller.getL1l2());
+        holder.socket.setText(controller.getSocket());
+        holder.battery.setText(controller.getBattery());
+        holder.innerCable.setText(controller.getInnerCable());
+        holder.motherboard.setText(controller.getMotherboard());
+    }
 
     @Override
     public int getItemCount() {
         return controllerList.size();
-    } // End of getItemCount()
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
         Button save, edit;
         TextInputEditText id, timeOfLastRepair, body, rightAnalog, leftAnalog, buttons, stock, option, share, table, r1r2, l1l2, socket, battery, innerCable, motherboard;
 
@@ -113,7 +114,6 @@ public class ControllersAdapter extends RecyclerView.Adapter<ControllersAdapter.
                     inputLayout.setEnabled(true);
                 }
             });
-        } // End of ViewHolder()
-    } // End of ViewHolder
-
-} // End of ControllersAdapter
+        }
+    }
+}

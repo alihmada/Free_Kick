@@ -75,6 +75,12 @@ public class DateAndTime {
         return Duration.between(timeConverter(startingTimeWithFormat), timeConverter(endingTimeWithFormat));
     }
 
+    public static String convertToDuration(String timeString) {
+        LocalTime localTime = LocalTime.parse(timeString);
+        long seconds = localTime.toSecondOfDay();
+        return Duration.ofSeconds(seconds).toString();
+    }
+
     public static String durationToClockFormat(Duration timeElapsed) {
         return String.format("%s:%s:%s", String.format(timeElapsed.toHours() < 10 ? "0%s" : "%s", timeElapsed.toHours()), String.format((long) (Calculations.sub(timeElapsed.toMinutes(), Calculations.mul(timeElapsed.toHours(), 60))) < 10 ? "0%s" : "%s", (long) (Calculations.sub(timeElapsed.toMinutes(), Calculations.mul(timeElapsed.toHours(), 60)))), String.format((long) (Calculations.sub(timeElapsed.getSeconds(), Calculations.mul(timeElapsed.toMinutes(), 60))) < 10 ? "0%s" : "%s", (long) (Calculations.sub(timeElapsed.getSeconds(), Calculations.mul(timeElapsed.toMinutes(), 60)))));
     }
@@ -90,6 +96,47 @@ public class DateAndTime {
 
     public static String durationMinus(String duration1, String duration2) {
         return String.valueOf(Duration.parse(duration1).minus(Duration.parse(duration2)));
+    }
+
+    public static boolean isSpanningMultipleDays(String startingDateTime, String endingDateTime) {
+
+        try {
+            // Parse the starting and ending date/time strings
+            Date startingDate = dateFormat.parse(startingDateTime);
+            Date endingDate = dateFormat.parse(endingDateTime);
+
+            // Get the date components of the starting and ending dates
+            Calendar calendar = Calendar.getInstance();
+
+            assert startingDate != null;
+            calendar.setTime(startingDate);
+            int startingDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+            assert endingDate != null;
+            calendar.setTime(endingDate);
+            int endingDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+            // Compare the days
+            return startingDay != endingDay;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public static String[] getYesterday() {
+        String[] date = new String[3];
+
+        // Get the date of yesterday
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        date[0] = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        date[1] = String.valueOf(calendar.get(Calendar.MONTH) + 1); // Months are zero-based, so add 1
+        date[2] = String.valueOf(calendar.get(Calendar.YEAR));
+
+        return date;
     }
 
     public static String getYear() {
@@ -118,18 +165,26 @@ public class DateAndTime {
     }
 
     public static String getEnglishNameOfMonth() {
-        return new DateFormatSymbols(new Locale("en")).getMonths()[calendar.get(Calendar.MONTH)];
+        return new DateFormatSymbols(new Locale("en")).getMonths()[getMonthNumber()];
     }
 
     public static String getEnglishNameOfDay() {
-        return new DateFormatSymbols(new Locale("en")).getWeekdays()[calendar.get(Calendar.DAY_OF_WEEK)];
+        return new DateFormatSymbols(new Locale("en")).getWeekdays()[getDayNumber()];
     }
 
     public static String getArabicNameOfMonth() {
-        return new DateFormatSymbols(new Locale("ar")).getMonths()[calendar.get(Calendar.MONTH)];
+        return new DateFormatSymbols(new Locale("ar")).getMonths()[getMonthNumber()];
     }
 
     public static String getArabicNameOfDay() {
-        return new DateFormatSymbols(new Locale("ar")).getWeekdays()[calendar.get(Calendar.DAY_OF_WEEK)];
+        return new DateFormatSymbols(new Locale("ar")).getWeekdays()[getDayNumber()];
+    }
+
+    public static int getMonthNumber() {
+        return calendar.get(Calendar.MONTH);
+    }
+
+    public static int getDayNumber() {
+        return calendar.get(Calendar.DAY_OF_WEEK);
     }
 }

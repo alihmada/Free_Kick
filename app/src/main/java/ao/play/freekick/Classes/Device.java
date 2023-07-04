@@ -1,8 +1,11 @@
 package ao.play.freekick.Classes;
 
 public class Device {
-    private String header, startingTime, endingTime;
-    private int spinnerVisibility, spinnerIndex;
+    private String header;
+    private String startingTime;
+    private String endingTime;
+    private int spinnerVisibility;
+    private int spinnerIndex;
     private boolean solo;
     private boolean payment;
     private boolean running;

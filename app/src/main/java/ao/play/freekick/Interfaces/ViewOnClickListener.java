@@ -6,5 +6,7 @@ public interface
 ViewOnClickListener {
     void onClickListener(String position);
 
-    void languageHandler(RevenueDeviceData revenueDeviceData);
+    default void languageHandler(RevenueDeviceData revenueDeviceData) {
+
+    }
 }

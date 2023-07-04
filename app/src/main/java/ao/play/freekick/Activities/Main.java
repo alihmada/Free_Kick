@@ -2,6 +2,8 @@ package ao.play.freekick.Activities;
 
 import static ao.play.freekick.Models.Common.TIME_INTERVAL;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,9 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -56,20 +57,26 @@ import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.Loading;
 import ao.play.freekick.Dialogs.Password;
 import ao.play.freekick.Dialogs.Qr;
+import ao.play.freekick.Fragments.Account;
+import ao.play.freekick.Fragments.Debts;
+import ao.play.freekick.Fragments.Home;
 import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Interfaces.ViewListener;
 import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
-import ao.play.freekick.Services.PasswordRemovalService;
+import ao.play.freekick.Receivers.PasswordRemovalReceiver;
 
-public class Home extends AppCompatActivity implements ViewListener {
-
+public class Main extends AppCompatActivity implements ViewListener {
+    BottomNavigationView navigationView;
+    Home home;
+    Debts debts;
+    Account account;
     SharedPreferences sharedPreferences;
     Gson gson;
-    RecyclerView recyclerView;
     Vibrator vibrator;
     FingerprintManager fingerprintManager;
     long BackPressed;
+    AlarmManager alarmManager;
     ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {
             String code = null;
@@ -82,7 +89,7 @@ public class Home extends AppCompatActivity implements ViewListener {
             if (code != null) {
                 if (code.matches("controller\\d+")) {
 
-                    Intent intent = new Intent(Home.this, Controllers.class);
+                    Intent intent = new Intent(Main.this, Controllers.class);
                     intent.putExtra(Common.CODE, code);
 
                     startActivity(intent);
@@ -95,26 +102,57 @@ public class Home extends AppCompatActivity implements ViewListener {
                     }
 
                     HomeAdapter adapter = new HomeAdapter(this, devices, this);
-                    recyclerView.setAdapter(adapter);
+                    Home.recyclerView.setAdapter(adapter);
                 }
             }
         }
     }); // End of registerForActivityResult()
 
+    public static void createQR(Context context, String text) {
+        BitMatrix bitMatrix = null;
+        try {
+            bitMatrix = new QRCodeWriter().encode(EncryptionAndDecryption.encrypt(text), BarcodeFormat.QR_CODE, 780, 780);
+        } catch (Exception ignored) {
+
+        }
+        int width = Objects.requireNonNull(bitMatrix).getWidth();
+        int height = bitMatrix.getHeight();
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+            }
+        }
+
+        Qr.showQrDialog(context, bitmap);
+
+    } // End of createQR()
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_main);
 
         setCustomActionBar();
 
         itemsDeclaration();
 
-        DataCollector.collect(this);
-        List<Device> devices = Arrays.asList(DataCollector.getDevices());
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, home).commit();
 
-        HomeAdapter adapter = new HomeAdapter(this, devices, this);
-        recyclerView.setAdapter(adapter);
+        navigationView.setOnItemSelectedListener(item -> {
+            if (item.getItemId() == R.id.home) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, home).commit();
+                return true;
+            } else if (item.getItemId() == R.id.debt) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, debts).commit();
+                return true;
+            } else if (item.getItemId() == R.id.account) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, account).commit();
+                return true;
+            }
+            return false;
+        });
     } // End of onCreate()
 
     @Override
@@ -136,68 +174,22 @@ public class Home extends AppCompatActivity implements ViewListener {
 
     private void itemsDeclaration() {
 
+        navigationView = findViewById(R.id.navigation);
+
+        home = new Home();
+
+        debts = new Debts();
+
+        account = new Account();
+
         Loading.progressDialogConstructor(this);
 
         fingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
 
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
         findViewById(R.id.tool_bar_title).setOnLongClickListener(v -> {
-            if (sharedPreferences.getString(Common.USER_PASSWORD, "").equals("")) {
-                Password password = new Password(passcode -> {
-                    try {
-                        if (passcode.equals(EncryptionAndDecryption.decrypt(Common.PASSWORD))) {
-
-                            Intent revenue = new Intent(Home.this, Revenue.class);
-                            revenue.putExtra(Common.TITLE, getString(R.string.years));
-                            revenue.putExtra(Common.YEAR, true);
-
-                            startActivity(revenue);
-
-                            if (fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints()) {
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(Common.USER_PASSWORD, passcode);
-                                editor.apply();
-                            }
-
-                            Intent intent = new Intent(this, PasswordRemovalService.class);
-                            startService(intent);
-
-                        } else {
-                            Toast.makeText(this, "😒", Toast.LENGTH_LONG).show();
-                        }
-                    } catch (Exception ignored) {
-                    }
-                });
-
-                password.show(getSupportFragmentManager(), "password_dialog");
-            } else {
-
-                // Check if the device has a fingerprint sensor
-                if (fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints()) {
-                    // Create a prompt to ask the user to set up a fingerprint
-                    BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.use_your_fingerprint)).setDescription(getString(R.string.free_kick_verify)).setNegativeButtonText(getString(R.string.cancel)).build();
-
-                    // Create a callback to handle the result of the authentication prompt
-                    BiometricPrompt.AuthenticationCallback authenticationCallback = new BiometricPrompt.AuthenticationCallback() {
-                        @Override
-                        public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                            super.onAuthenticationSucceeded(result);
-
-                            Intent revenue = new Intent(Home.this, Revenue.class);
-                            revenue.putExtra(Common.TITLE, getString(R.string.years));
-                            revenue.putExtra(Common.YEAR, true);
-
-                            startActivity(revenue);
-                        }
-                    };
-
-                    // Create a BiometricPrompt to show the authentication prompt
-                    BiometricPrompt biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), authenticationCallback);
-
-                    // Show the authentication prompt
-                    biometricPrompt.authenticate(promptInfo);
-                }
-
-            }
+            getPassword(sharedPreferences.getString(Common.USER_PASSWORD, "").equals(""));
             return false;
         });
 
@@ -209,10 +201,71 @@ public class Home extends AppCompatActivity implements ViewListener {
         }
 
         gson = new Gson();
-
-        recyclerView = findViewById(R.id.home_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     } // End of itemsDeclaration()
+
+    private void openPasswordDialog(String pass) {
+        Password password = new Password(passcode -> {
+            try {
+                if (passcode.equals(EncryptionAndDecryption.decrypt(pass))) {
+
+                    startRevenue();
+
+                    if (haveFingerprint()) {
+                        sharedPreferences.edit().putString(Common.USER_PASSWORD, EncryptionAndDecryption.encrypt(passcode)).apply();
+                        setPasswordRemovalReceiver();
+                    }
+
+                } else {
+                    Toast.makeText(this, "😒", Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception ignored) {
+            }
+        });
+
+        password.show(getSupportFragmentManager(), "password_dialog");
+    } // End of openPasswordDialog()
+
+    private void startRevenue() {
+        Intent revenue = new Intent(Main.this, Revenue.class);
+        revenue.putExtra(Common.TITLE, getString(R.string.years));
+        revenue.putExtra(Common.YEAR, true);
+
+        startActivity(revenue);
+    } // End of startRevenue()
+
+    private void setPasswordRemovalReceiver() {
+        Intent intent = new Intent(this, PasswordRemovalReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.DAY_OF_YEAR, 7 - calendar.get(Calendar.DAY_OF_WEEK));
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+    } // End of setPasswordRemovalReceiver()
+
+    private void verifyByFingerprint() {
+        if (haveFingerprint()) {
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.use_your_fingerprint)).setDescription(getString(R.string.free_kick_verify)).setNegativeButtonText(getString(R.string.cancel)).build();
+
+            BiometricPrompt.AuthenticationCallback authenticationCallback = new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+
+                    startRevenue();
+                }
+            };
+
+            BiometricPrompt biometricPrompt = new BiometricPrompt(this, Executors.newSingleThreadExecutor(), authenticationCallback);
+
+            biometricPrompt.authenticate(promptInfo);
+        }
+    } // End of verifyByFingerprint()
+
+    private boolean haveFingerprint() {
+        return fingerprintManager.isHardwareDetected() && fingerprintManager.hasEnrolledFingerprints();
+    } // End of haveFingerprint()
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -242,24 +295,7 @@ public class Home extends AppCompatActivity implements ViewListener {
 
             DataCollector.collect(this);
 
-            BitMatrix bitMatrix = null;
-            try {
-                bitMatrix = new QRCodeWriter().encode(EncryptionAndDecryption.encrypt(DataCollector.getData()), BarcodeFormat.QR_CODE, 780, 780);
-            } catch (Exception ignored) {
-
-            }
-            int width = Objects.requireNonNull(bitMatrix).getWidth();
-            int height = bitMatrix.getHeight();
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
-            }
-
-            Qr.showQrDialog(this, bitmap);
-
+            createQR(this, DataCollector.getData());
             return true;
         } else if (item.getItemId() == R.id.scanner) {
 
@@ -279,7 +315,7 @@ public class Home extends AppCompatActivity implements ViewListener {
             }
 
             HomeAdapter adapter = new HomeAdapter(this, devices, this);
-            recyclerView.setAdapter(adapter);
+            Home.recyclerView.setAdapter(adapter);
 
             return true;
         } else if (item.getItemId() == R.id.exit) {
@@ -318,8 +354,8 @@ public class Home extends AppCompatActivity implements ViewListener {
                 }
 
                 if (deviceList.size() != 0) {
-                    HomeAdapter adapter = new HomeAdapter(Home.this, deviceList, Home.this);
-                    recyclerView.setAdapter(adapter);
+                    HomeAdapter adapter = new HomeAdapter(Main.this, deviceList, Main.this);
+                    Home.recyclerView.setAdapter(adapter);
                     Loading.dismissProgressDialog();
                 }
             }
@@ -331,18 +367,42 @@ public class Home extends AppCompatActivity implements ViewListener {
         });
     } // End of download()
 
+    private void getPassword(boolean compare) {
+        if (Internet.isConnected(this)) {
+            Firebase.getRoot().child("password").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String password = snapshot.getValue(String.class);
+                    if (compare) openPasswordDialog(password);
+                    else {
+                        if (sharedPreferences.getString(Common.USER_PASSWORD, "").equals(password)) {
+                            verifyByFingerprint();
+                        } else {
+                            openPasswordDialog(password);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+    } // End of getPassword()
+
     @Override
     public void languageHandler(Device device, int position) {
         if (device != null) {
             if (device.getStartingTime().contains("م") || device.getStartingTime().contains("ص")) {
                 if (Locale.getDefault().getLanguage().equals("en")) {
-                    device.setHeader(HomeAdapter.ViewHolder.headers[position]);
+                    device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
                     device.setStartingTime(device.getStartingTime().replace("م", "PM").replace("ص", "AM"));
                     device.setEndingTime(device.getEndingTime().replace("م", "PM").replace("ص", "AM"));
                 }
             } else if (device.getStartingTime().contains("PM") || device.getStartingTime().contains("AM")) {
                 if (Locale.getDefault().getLanguage().equals("ar")) {
-                    device.setHeader(HomeAdapter.ViewHolder.headers[position]);
+                    device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
                     device.setStartingTime(device.getStartingTime().replace("PM", "م").replace("AM", "ص"));
                     device.setEndingTime(device.getEndingTime().replace("PM", "م").replace("AM", "ص"));
                 }
@@ -377,5 +437,4 @@ public class Home extends AppCompatActivity implements ViewListener {
             vibrator.vibrate(VibrationEffect.createPredefined(effect));
         }
     } // End of vibration()
-
 }

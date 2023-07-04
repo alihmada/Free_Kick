@@ -31,7 +31,6 @@ import ao.play.freekick.Models.Controller;
 import ao.play.freekick.R;
 
 public class Controllers extends AppCompatActivity {
-
     RecyclerView recyclerView;
     ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null) {

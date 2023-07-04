@@ -15,28 +15,31 @@ public class DataCollector {
 
     public static void collect(Context context) {
         Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getDecryptedSharedPreferences(context);
+
+        devices = new Device[Common.DEVICES_NUMBER];
+
+        for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
+            devices[i] = gson.fromJson(sharedPreferences.getString(String.valueOf(i), ""), Device.class);
+        }
+
+        data = gson.toJson(devices);
+    }
+
+    private static SharedPreferences getDecryptedSharedPreferences(Context context) {
         SharedPreferences sharedPreferences = null;
         try {
             sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
         } catch (Exception ignored) {
         }
-
-        devices = new Device[Common.DEVICES_NUMBER];
-
-        for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
-
-            assert sharedPreferences != null;
-            devices[i] = gson.fromJson(sharedPreferences.getString(String.valueOf(i), ""), Device.class);
-        }
-
-        data = gson.toJson(devices);
-    } // End of collect()
+        return sharedPreferences;
+    }
 
     public static String getData() {
         return data;
-    } // End of getData
+    }
 
     public static Device[] getDevices() {
         return devices;
-    } // End of getDevices()
-} // End of DataCollector()
+    }
+}

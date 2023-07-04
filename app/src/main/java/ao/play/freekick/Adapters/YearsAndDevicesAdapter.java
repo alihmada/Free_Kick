@@ -17,9 +17,8 @@ import ao.play.freekick.Models.YearAndDevice;
 import ao.play.freekick.R;
 
 public class YearsAndDevicesAdapter extends RecyclerView.Adapter<YearsAndDevicesAdapter.ViewHolder> {
-
-    List<YearAndDevice> yearAndDevices;
-    ViewOnClickListener viewOnClickListener;
+    private final List<YearAndDevice> yearAndDevices;
+    private final ViewOnClickListener viewOnClickListener;
 
     public YearsAndDevicesAdapter(List<YearAndDevice> yearAndDevices, ViewOnClickListener viewOnClickListener) {
         this.yearAndDevices = yearAndDevices;
@@ -35,17 +34,18 @@ public class YearsAndDevicesAdapter extends RecyclerView.Adapter<YearsAndDevices
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        YearAndDevice item = yearAndDevices.get(position);
         if (Revenue.isDevice) {
-            String number = yearAndDevices.get(position).getNumber();
+            String number = item.getNumber();
             holder.number.setText(number);
-            holder.name.setText(HomeAdapter.ViewHolder.headers[Integer.parseInt(number) - 1]);
+            holder.name.setText(HomeAdapter.ViewHolder.HEADERS[Integer.parseInt(number) - 1]);
 
         } else {
             holder.number.setText(String.valueOf(position + 1));
-            holder.name.setText(yearAndDevices.get(position).getNumber());
+            holder.name.setText(item.getNumber());
         }
-        holder.time.setText(DateAndTime.durationToClockFormat(yearAndDevices.get(position).getDuration()));
-        holder.price.setText(String.valueOf(yearAndDevices.get(position).getPrice()));
+        holder.time.setText(DateAndTime.durationToClockFormat(item.getDuration()));
+        holder.price.setText(String.valueOf(item.getPrice()));
     }
 
     @Override
@@ -59,7 +59,6 @@ public class YearsAndDevicesAdapter extends RecyclerView.Adapter<YearsAndDevices
 
         public ViewHolder(@NonNull View itemView, ViewOnClickListener viewOnClickListener) {
             super(itemView);
-
             number = itemView.findViewById(R.id.number);
             name = itemView.findViewById(R.id.name);
             time = itemView.findViewById(R.id.time);

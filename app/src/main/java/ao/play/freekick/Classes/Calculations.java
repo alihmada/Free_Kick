@@ -6,7 +6,7 @@ import ao.play.freekick.Models.Common;
 
 public class Calculations {
 
-    public static double sum(double firstNumber, double secondNumber) {
+    public static int sum(int firstNumber, int secondNumber) {
         return firstNumber + secondNumber;
     }
 
@@ -30,12 +30,13 @@ public class Calculations {
         return mod(number, 2) == 0;
     }
 
-    public static String priceCalculator(boolean isSolo, Duration timeElapsed) {
-        if (isSolo) {
-            return String.valueOf(Calculations.mul(Calculations.div(timeElapsed.toMinutes(), Common.HOUR), Common.HOUR_PRICE));
-        } else {
-            return String.valueOf(Calculations.mul(Calculations.div(timeElapsed.toMinutes(), Common.HOUR), mul(Common.HOUR_PRICE, 2)));
-        }
+    public static String round(String number) {
+        return String.valueOf((double) Math.round(Double.parseDouble(number)));
     }
 
+    public static String priceCalculator(boolean isSolo, Duration timeElapsed) {
+        double minutes = timeElapsed.toMinutes();
+        double hourPrice = isSolo ? Common.HOUR_PRICE : Common.HOUR_PRICE * 2;
+        return String.valueOf(mul(div(minutes, Common.HOUR), hourPrice));
+    }
 }
