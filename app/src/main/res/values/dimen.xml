@@ -8,5 +8,5 @@
     <dimen name="card_corner_radius">15dp</dimen>
     <dimen name="card_elevation">15dp</dimen>
     <dimen name="horizontal_padding">30dp</dimen>
-    <dimen name="corner_size">32dp</dimen>
+    <dimen name="corner_size">19dp</dimen>
 </resources>

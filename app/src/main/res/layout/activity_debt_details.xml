@@ -87,9 +87,9 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/for_you"
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/buttonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin"
@@ -100,9 +100,9 @@
                 android:textSize="@dimen/text_size"
                 android:textStyle="bold" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/for_me"
-                style="?android:attr/buttonBarButtonStyle"
+                style="@style/buttonStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin"

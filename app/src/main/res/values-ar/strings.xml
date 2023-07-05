@@ -187,6 +187,7 @@
 
     <string name="for_you">ليك</string>
     <string name="for_him">ليه</string>
+    <string name="user_exist">هذا المستخدم موجود بالفعل</string>
 
     <!-- are you sure dialog -->
 

@@ -208,7 +208,7 @@
     <!-- debt -->
     <string name="for_him">For him</string>
     <string name="for_you">For you</string>
-
+    <string name="user_exist">This user already exist</string>
 
     <!-- are you sure dialog -->
     <string name="are_you_sure_delete">Are you sure, you want delete data?</string>

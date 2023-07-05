@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -86,10 +87,26 @@ public class Debts extends Fragment implements ViewOnClickListener {
 
     private void openCustomerDialog() {
         Value customerName = new Value(name -> {
-            Customer customer = new Customer(UniqueIdGenerator.generateUniqueId(), name, "0", "0");
-            Firebase.getDebt().push().setValue(customer);
+            Query query = Firebase.getDebt().orderByChild("name").equalTo(name);
 
-            setRecyclerView();
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(!snapshot.exists()){
+                        Customer customer = new Customer(UniqueIdGenerator.generateUniqueId(), name, "0", "0");
+                        Firebase.getDebt().push().setValue(customer);
+
+                        setRecyclerView();
+                    } else {
+                        Toast.makeText(requireContext(), requireContext().getString(R.string.user_exist), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         });
 
         customerName.show(getChildFragmentManager(), "customer_dialog");

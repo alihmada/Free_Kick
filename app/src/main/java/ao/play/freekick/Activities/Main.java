@@ -211,7 +211,11 @@ public class Main extends AppCompatActivity implements ViewListener {
                     startRevenue();
 
                     if (haveFingerprint()) {
-                        sharedPreferences.edit().putString(Common.USER_PASSWORD, EncryptionAndDecryption.encrypt(passcode)).apply();
+                        sharedPreferences
+                                .edit()
+                                .putString(Common.USER_PASSWORD,
+                                        EncryptionAndDecryption.encrypt(passcode))
+                                .apply();
                         setPasswordRemovalReceiver();
                     }
 
@@ -372,10 +376,11 @@ public class Main extends AppCompatActivity implements ViewListener {
             Firebase.getRoot().child("password").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    String password = snapshot.getValue(String.class);
+                    String password = Objects.requireNonNull(snapshot.getValue(String.class)).trim();
                     if (compare) openPasswordDialog(password);
                     else {
-                        if (sharedPreferences.getString(Common.USER_PASSWORD, "").equals(password)) {
+                        String passcode = sharedPreferences.getString(Common.USER_PASSWORD, "").trim();
+                        if (passcode.equals(password)) {
                             verifyByFingerprint();
                         } else {
                             openPasswordDialog(password);
