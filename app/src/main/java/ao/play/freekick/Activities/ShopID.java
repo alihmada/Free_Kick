@@ -112,7 +112,7 @@ public class ShopID extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
 
-                        Common.setROOT(id);
+                        sharedPreferences.edit().putString(Common.SHOP_ID, id).apply();
 
                         Query userQuery = Firebase.getUsers(ShopID.this).orderByChild("phoneNumber").equalTo(Firebase.getPhoneNumber());
 
@@ -135,7 +135,7 @@ public class ShopID extends AppCompatActivity {
                                         reference.setValue(new User(_1stName, _2ndName, Firebase.getPhoneNumber(), user.isAdmin()));
                                     }
                                 }
-                                sharedPreferences.edit().putString(Common.USER_DATA, new Gson().toJson(user)).putString(Common.SHOP_ID, id).apply();
+                                sharedPreferences.edit().putString(Common.USER_DATA, new Gson().toJson(user)).apply();
                             }
 
                             @Override
