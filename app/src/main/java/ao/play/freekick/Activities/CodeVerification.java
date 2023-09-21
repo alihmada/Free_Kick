@@ -2,13 +2,15 @@ package ao.play.freekick.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
-import android.widget.Toast;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -18,27 +20,33 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import ao.play.freekick.Data.Firebase;
+import ao.play.freekick.Dialogs.ConfirmationDialog;
+import ao.play.freekick.Dialogs.Loading;
 import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
 
 public class CodeVerification extends AppCompatActivity {
     FirebaseAuth mAuth;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-    TextInputEditText code;
     String verificationId;
     PhoneAuthProvider.ForceResendingToken token;
+    Button otp;
+    private EditText[] verificationDigits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_code_verification);
 
+        Loading.progressDialogConstructor(this);
+
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        ImageButton otp = findViewById(R.id.otp);
+        otp = findViewById(R.id.otp);
 
-        code = findViewById(R.id.code);
+        verificationDigits = new EditText[]{findViewById(R.id.phone_verification_1st_digit), findViewById(R.id.phone_verification_2nd_digit), findViewById(R.id.phone_verification_3rd_digit), findViewById(R.id.phone_verification_4th_digit), findViewById(R.id.phone_verification_5th_digit), findViewById(R.id.phone_verification_6th_digit)};
+
+        setupTextWatchers();
 
         mAuth = FirebaseAuth.getInstance();
         mAuth.setLanguageCode("ar");
@@ -58,8 +66,18 @@ public class CodeVerification extends AppCompatActivity {
             }
 
             @Override
-            public void onVerificationFailed(@NonNull FirebaseException e) {
-                Toast.makeText(CodeVerification.this, "Verification failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            public void onVerificationFailed(@NonNull FirebaseException error) {
+                ConfirmationDialog.show(CodeVerification.this, error.getLocalizedMessage(), new ConfirmationDialog.ConfirmationDialogListener() {
+                    @Override
+                    public void onConfirm() {
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
             }
 
             @Override
@@ -69,42 +87,74 @@ public class CodeVerification extends AppCompatActivity {
             }
         };
 
+        assert phone != null;
         if (!phone.equals("")) {
             sendVerificationCode(phone);
         }
 
         otp.setOnClickListener(v -> {
-            String inputCode = String.valueOf(code.getText());
-            if (!inputCode.equals(""))
-                codeVerification(inputCode);
+            StringBuilder code = new StringBuilder();
+            for (EditText editText : verificationDigits) {
+                code.append(editText.getText());
+            }
+            if (!code.toString().equals("")) {
+                codeVerification(code.toString());
+                Loading.showProgressDialog();
+            }
         });
     }
 
+    private void setupTextWatchers() {
+        for (int i = 0; i < verificationDigits.length; i++) {
+            final int currentPosition = i;
+            verificationDigits[i].addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (count == 1 && currentPosition < verificationDigits.length - 1) {
+                        setFocusable(verificationDigits[currentPosition + 1]);
+                    } else if (count == 0 && currentPosition > 0) {
+                        setFocusable(verificationDigits[currentPosition - 1]);
+                        setSelectAll(verificationDigits[currentPosition - 1]);
+                    } else if (currentPosition == verificationDigits.length - 1) {
+                        otp.performClick();
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            });
+        }
+    }
+
+    private void setFocusable(EditText editText) {
+        editText.requestFocus();
+    }
+
+    private void setSelectAll(EditText editText) {
+        editText.selectAll();
+    }
+
     private void sendVerificationCode(String phone) {
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber(phone)
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(this)
-                .setCallbacks(mCallbacks)
-                .build();
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth).setPhoneNumber(phone).setTimeout(60L, TimeUnit.SECONDS).setActivity(this).setCallbacks(mCallbacks).build();
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
-
-                try {
-                    getSharedPreferences(Common.SHARED_PREFERENCE_NAME, MODE_PRIVATE)
-                            .edit()
-                            .putString(Common.USER, String.valueOf(Firebase.getCurrentUser()))
-                            .apply();
-                } catch (Exception ignored) {
-                }
-
                 Intent intent = new Intent(getBaseContext(), ShopID.class);
                 startActivity(intent);
                 finish();
+                Loading.dismissProgressDialog();
+            } else {
+                for (EditText editText : verificationDigits) {
+                    editText.setBackground(AppCompatResources.getDrawable(this, R.drawable.error));
+                }
             }
         });
     }

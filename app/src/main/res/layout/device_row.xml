@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/cardViewStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/header"
+            style="@style/textViewStyle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/components_height"
+            app:layout_constraintEnd_toStartOf="@+id/spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            style="@style/spinnerStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/components_height"
+            app:layout_constraintBottom_toBottomOf="@+id/header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/header" />
+
+        <EditText
+            android:id="@+id/starting_time"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:hint="@string/txtStarting"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header" />
+
+        <EditText
+            android:id="@+id/ending_time"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:hint="@string/txtEnding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/starting_time" />
+
+        <RadioGroup
+            android:id="@+id/radio_button_group"
+            style="@style/radioButtonGroupStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            app:layout_constraintEnd_toStartOf="@+id/add"
+            app:layout_constraintStart_toEndOf="@+id/delete"
+            app:layout_constraintTop_toBottomOf="@+id/ending_time">
+
+            <RadioButton
+                android:id="@+id/solo"
+                style="@style/radioButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/radioButtonIndividual" />
+
+            <RadioButton
+                android:id="@+id/multi"
+                style="@style/radioButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/margin"
+                android:text="@string/radioButtonMultiplayer" />
+        </RadioGroup>
+
+        <ImageButton
+            android:id="@+id/delete"
+            style="@style/buttonStyle"
+            android:layout_width="@dimen/components_height"
+            android:layout_height="@dimen/components_height"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/delete_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_button_group"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/radio_button_group" />
+
+        <ImageButton
+            android:id="@+id/add"
+            style="@style/buttonStyle"
+            android:layout_width="@dimen/components_height"
+            android:layout_height="@dimen/components_height"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/plus_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_button_group"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/radio_button_group" />
+
+        <TextView
+            android:id="@+id/time"
+            style="@style/textViewStyle"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/components_height"
+            android:text="@string/time"
+            app:layout_constraintEnd_toStartOf="@+id/save"
+            app:layout_constraintStart_toEndOf="@+id/history"
+            app:layout_constraintTop_toBottomOf="@+id/radio_button_group" />
+
+        <ImageButton
+            android:id="@+id/history"
+            style="@style/buttonStyle"
+            android:layout_width="@dimen/components_height"
+            android:layout_height="@dimen/components_height"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/history_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/time" />
+
+        <ImageButton
+            android:id="@+id/save"
+            style="@style/buttonStyle"
+            android:layout_width="@dimen/components_height"
+            android:layout_height="@dimen/components_height"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/save_icon"
+            app:layout_constraintBottom_toBottomOf="@+id/time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/time" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/payment_parent"
+            style="@style/focusable_clickable"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:background="@drawable/input_filed"
+            app:layout_constraintEnd_toEndOf="@+id/save"
+            app:layout_constraintStart_toStartOf="@+id/history"
+            app:layout_constraintTop_toBottomOf="@+id/time">
+
+            <TextView
+                android:id="@+id/price"
+                style="@style/not_focusable_clickable"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="@string/price"
+                android:textSize="@dimen/text_size"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <CheckBox
+                android:id="@+id/payment"
+                style="@style/not_focusable_clickable"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="15dp"
+                android:background="@drawable/checkbox"
+                android:button="@null"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/calculate"
+            style="@style/buttonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:text="@string/calculate"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/payment_parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

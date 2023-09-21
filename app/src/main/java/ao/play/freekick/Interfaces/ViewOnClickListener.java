@@ -4,9 +4,9 @@ import ao.play.freekick.Models.RevenueDeviceData;
 
 public interface
 ViewOnClickListener {
-    void onClickListener(String position);
+    void onClickListener(String id);
 
-    default void languageHandler(RevenueDeviceData revenueDeviceData) {
+    void openProfile(String id);
 
-    }
+    void languageHandler(RevenueDeviceData revenueDeviceData);
 }

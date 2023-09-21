@@ -3,17 +3,17 @@ package ao.play.freekick.Models;
 public class Customer {
     private String id;
     private String name;
-    private String forMe;
+    private String forHim;
     private String forYou;
 
     public Customer() {
 
     }
 
-    public Customer(String id, String name, String forMe, String forYou) {
+    public Customer(String id, String name, String forHim, String forYou) {
         this.id = id;
         this.name = name;
-        this.forMe = forMe;
+        this.forHim = forHim;
         this.forYou = forYou;
     }
 
@@ -33,12 +33,12 @@ public class Customer {
         this.name = name;
     }
 
-    public String getForMe() {
-        return forMe;
+    public String getForHim() {
+        return forHim;
     }
 
-    public void setForMe(String forMe) {
-        this.forMe = forMe;
+    public void setForHim(String forHim) {
+        this.forHim = forHim;
     }
 
     public String getForYou() {

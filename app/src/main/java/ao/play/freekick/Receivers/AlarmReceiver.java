@@ -4,12 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
-import java.util.Timer;
 
 import ao.play.freekick.Adapters.HomeAdapter;
 import ao.play.freekick.Classes.Calculations;
@@ -71,9 +70,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void removeCallbacks(int position) {
         try {
-            Timer timer = HomeAdapter.integerTimerHashMap.get(position);
-            if (timer != null) {
-                timer.cancel();
+            Handler handler = HomeAdapter.integerHandlerHashMap.get(position);
+            Runnable runnable = HomeAdapter.integerRunnableHashMap.get(position);
+            if (handler != null && runnable != null) {
+                handler.removeCallbacks(runnable);
             }
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);

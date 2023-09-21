@@ -1,6 +1,7 @@
 package ao.play.freekick.Data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,9 +16,11 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
+import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Dialogs.Loading;
 import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Models.Common;
@@ -25,56 +28,63 @@ import ao.play.freekick.Models.RevenueDeviceData;
 import ao.play.freekick.R;
 
 public class Firebase {
+    private static SharedPreferences sharedPreferences;
+
     public static FirebaseDatabase getInstance() {
         return FirebaseDatabase.getInstance();
     } // End getInstance()
 
-    public static DatabaseReference getRoot() {
-        return getInstance().getReference(Common.ROOT);
+    public static DatabaseReference getRoot(Context context) {
+        rootHaveValue(context);
+        return getInstance().getReference(Common.getROOT());
     } // End getRoot()
 
-    public static DatabaseReference getDatabase() {
-        return getRoot().child(Common.DATABASE_NAME);
+    public static DatabaseReference getDatabase(Context context) {
+        return getRoot(context).child(Common.DATABASE_NAME);
     } // End getDatabase()
 
-    public static DatabaseReference getDevices() {
-        return getRoot().child(Common.DEVICE);
+    public static DatabaseReference getUsers(Context context) {
+        return getRoot(context).child(Common.FIREBASE_USERS);
     } // End getDatabase()
 
-    public static DatabaseReference getYear(String year) {
-        return getDatabase().child(year);
+    public static DatabaseReference getDevices(Context context) {
+        return getRoot(context).child(Common.DEVICE);
+    } // End getDatabase()
+
+    public static DatabaseReference getYear(Context context, String year) {
+        return getDatabase(context).child(year);
     } // End getYears()
 
-    public static DatabaseReference getMonth(String year, String month) {
-        return getYear(year).child(month);
+    public static DatabaseReference getMonth(Context context, String year, String month) {
+        return getYear(context, year).child(month);
     } // End getMonth()
 
     public static DatabaseReference getMonth(DatabaseReference year, String month) {
         return year.child(month);
     } // End getMonth()
 
-    public static DatabaseReference getDay(String year, String month, String day) {
-        return getMonth(year, month).child(day);
+    public static DatabaseReference getDay(Context context, String year, String month, String day) {
+        return getMonth(context, year, month).child(day);
     } // End getDay()
 
     public static DatabaseReference getDay(DatabaseReference month, String day) {
         return month.child(day);
     } // End getDay()
 
-    public static DatabaseReference getDevice(String year, String month, String day, String device) {
-        return getDay(year, month, day).child(device);
+    public static DatabaseReference getDevice(Context context, String year, String month, String day, String device) {
+        return getDay(context, year, month, day).child(device);
     } // End getDevice()
 
     public static DatabaseReference getDevice(DatabaseReference day, String device) {
         return day.child(device);
     } // End getDevice()
 
-    public static DatabaseReference getController() {
-        return getRoot().child(Common.CONTROLLERS);
+    public static DatabaseReference getController(Context context) {
+        return getRoot(context).child(Common.CONTROLLERS);
     } // End getController()
 
-    public static DatabaseReference getDebt() {
-        return getRoot().child(Common.DEBT);
+    public static DatabaseReference getDebt(Context context) {
+        return getRoot(context).child(Common.DEBT);
     } // End of getDebt()
 
     public static FirebaseAuth getFirebaseAuth() {
@@ -89,16 +99,30 @@ public class Firebase {
         return getCurrentUser().getPhoneNumber();
     } // End of getPhoneNumber()
 
+    public static void rootHaveValue(Context context) {
+        try {
+            sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+        } catch (Exception ignored) {
+        }
+
+        if (sharedPreferences != null) {
+            String root = sharedPreferences.getString(Common.SHOP_ID, "");
+            if (!Objects.equals(Common.getROOT(), root)) {
+                Common.setROOT(root);
+            }
+        }
+    }
+
     public static void upload(Device[] data, Context context) {
         Loading.showProgressDialog();
         if (!Internet.isConnected(context)) Loading.dismissProgressDialog();
 
-        getDevices().addListenerForSingleValueEvent(new ValueEventListener() {
+        getDevices(context).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // upload data to database
                 for (int i = 0; i < data.length; i++)
-                    getDevices().child(String.valueOf(i)).setValue(data[i]);
+                    getDevices(context).child(String.valueOf(i)).setValue(data[i]);
 
                 Loading.dismissProgressDialog();
                 Toast.makeText(context, context.getString(R.string.data_uploaded), Toast.LENGTH_LONG).show();
@@ -120,7 +144,7 @@ public class Firebase {
 
             String[] date = DateAndTime.getYesterday();
 
-            DatabaseReference year = getYear(date[2]);
+            DatabaseReference year = getYear(context, date[2]);
 
             DatabaseReference month = getMonth(year, date[1]);
 
@@ -162,7 +186,7 @@ public class Firebase {
             });
         }
 
-        DatabaseReference year = getYear(DateAndTime.getYear());
+        DatabaseReference year = getYear(context, DateAndTime.getYear());
 
         year.child(Common.NUMBER).setValue(DateAndTime.getYear());
 

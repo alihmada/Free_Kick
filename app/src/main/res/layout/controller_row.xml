@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
     android:scrollbars="none">
 
     <LinearLayout
@@ -11,248 +9,266 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_id"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/id" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/time">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_last_time"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/time_of_last_repairing" />
+        <EditText
+            android:id="@+id/controller_id"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_body"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/body" />
+        <EditText
+            android:id="@+id/controller_last_time"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/body"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_right_analog"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/right_analog" />
+        <EditText
+            android:id="@+id/controller_body"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/body" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/right_analog"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_left_analog"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/left_analog" />
+        <EditText
+            android:id="@+id/controller_right_analog"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/right_analog" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/left_analog"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_buttons"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/xo" />
+        <EditText
+            android:id="@+id/controller_left_analog"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/left_analog" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_stock"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/stocks" />
+        <EditText
+            android:id="@+id/controller_buttons"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/stocks"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_option"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/option" />
+        <EditText
+            android:id="@+id/controller_stock"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/stocks" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_share"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/share" />
+        <EditText
+            android:id="@+id/controller_option"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_table"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/table" />
+        <EditText
+            android:id="@+id/controller_share"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_l1l2"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/l1l2" />
+        <EditText
+            android:id="@+id/controller_table"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_r1r2"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/r1r2" />
+        <EditText
+            android:id="@+id/controller_l1l2"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_socket"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/socket" />
+        <EditText
+            android:id="@+id/controller_r1r2"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/socket"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_battery"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/battery" />
+        <EditText
+            android:id="@+id/controller_socket"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/socket" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/battery"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_motherboard"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/motherboard" />
+        <EditText
+            android:id="@+id/controller_battery"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/battery" />
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/general_text_input_layout"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:placeholderText="@string/error_placeholder">
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/motherboard"
+            android:textSize="@dimen/text_size" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/controller_innercable"
-                style="@style/control_input_style"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/inner_cable" />
+        <EditText
+            android:id="@+id/controller_motherboard"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/motherboard" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:gravity="center"
+            android:text="@string/inner_cable"
+            android:textSize="@dimen/text_size" />
+
+        <EditText
+            android:id="@+id/controller_innercable"
+            style="@style/edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/components_height"
+            android:layout_marginTop="@dimen/margin"
+            android:hint="@string/inner_cable" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin"
             android:orientation="horizontal">
 
             <Button
@@ -273,7 +289,5 @@
                 android:text="@string/edit" />
 
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>

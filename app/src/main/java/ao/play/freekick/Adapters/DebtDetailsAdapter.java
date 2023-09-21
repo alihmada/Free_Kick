@@ -1,5 +1,6 @@
 package ao.play.freekick.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +26,19 @@ import ao.play.freekick.Models.CustomerDetails;
 import ao.play.freekick.R;
 
 public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.ViewHolder> {
+    Context context;
     List<CustomerDetails> customerDetails;
 
-    public DebtDetailsAdapter(List<CustomerDetails> customerDetails) {
+    public DebtDetailsAdapter(Context context, List<CustomerDetails> customerDetails) {
+        this.context = context;
         this.customerDetails = customerDetails;
     }
 
     @NonNull
+
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.debt_customer_details, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.debt_customer_details_row, parent, false);
         return new DebtDetailsAdapter.ViewHolder(view);
     }
 
@@ -52,7 +56,7 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
 
     public void removeItem(int position) {
 
-        Query query = Debts.ref.orderByChild("id").equalTo(customerDetails.get(position).getId());
+        Query query = Debts.reference.orderByChild("id").equalTo(customerDetails.get(position).getId());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -60,10 +64,11 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     dataSnapshot.getRef().removeValue();
 
+
                     if (customerDetails.get(position).getLetter().equals("-")) {
-                        updateForYou(customerDetails.get(position).getValue(), Debts.customer.getId());
+                        updateForHim(customerDetails.get(position).getValue(), Debts.customer.getId());
                     } else {
-                        updateForMe(customerDetails.get(position).getValue(), Debts.customer.getId());
+                        updateForYou(customerDetails.get(position).getValue(), Debts.customer.getId());
                     }
                 }
 
@@ -78,8 +83,8 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
         });
     }
 
-    private void updateForMe(String value, String id) {
-        Query query = Firebase.getDebt().orderByChild("id").equalTo(id);
+    private void updateForHim(String value, String id) {
+        Query query = Firebase.getDebt(context).orderByChild("id").equalTo(id);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -87,8 +92,8 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Customer customer = dataSnapshot.getValue(Customer.class);
                     assert customer != null;
-                    double newValue = Double.parseDouble(customer.getForMe()) - Double.parseDouble(value);
-                    Debts.ref.child(Common.FOR_ME).setValue(String.valueOf(newValue));
+                    double newValue = Double.parseDouble(customer.getForHim()) - Double.parseDouble(value);
+                    Debts.reference.child(Common.FOR_HIM).setValue(String.valueOf(newValue));
                 }
             }
 
@@ -100,7 +105,7 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
     }
 
     private void updateForYou(String value, String id) {
-        Query query = Firebase.getDebt().orderByChild("id").equalTo(id);
+        Query query = Firebase.getDebt(context).orderByChild("id").equalTo(id);
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -109,7 +114,7 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
                     Customer customer = dataSnapshot.getValue(Customer.class);
                     assert customer != null;
                     double newValue = Double.parseDouble(customer.getForYou()) - Double.parseDouble(value);
-                    Debts.ref.child(Common.FOR_YOU).setValue(String.valueOf(newValue));
+                    Debts.reference.child(Common.FOR_YOU).setValue(String.valueOf(newValue));
                 }
             }
 
@@ -120,7 +125,6 @@ public class DebtDetailsAdapter extends RecyclerView.Adapter<DebtDetailsAdapter.
         });
 
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

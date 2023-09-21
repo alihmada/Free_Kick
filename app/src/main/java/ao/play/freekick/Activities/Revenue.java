@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -52,7 +54,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
         if (getIntent().getBooleanExtra(Common.YEAR, false)) {
             isDevice = false;
-            Firebase.getDatabase().addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getDatabase(this).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<YearAndDevice> years = new ArrayList<>();
 
                 @Override
@@ -65,6 +67,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
                     }
 
                     if (!years.isEmpty()) {
+                        Collections.reverse(years);
                         YearsAndDevicesAdapter adapter = new YearsAndDevicesAdapter(years, Revenue.this);
                         recyclerView.setAdapter(adapter);
                     }
@@ -76,7 +79,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
             });
 
         } else if (getIntent().getBooleanExtra(Common.MONTH, false)) {
-            Firebase.getYear(getIntent().getStringExtra(Common.YEAR_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getYear(this, getIntent().getStringExtra(Common.YEAR_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<MonthAndDay> months = new ArrayList<>();
 
                 @Override
@@ -89,6 +92,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
                     }
 
                     if (!months.isEmpty()) {
+                        Collections.reverse(months);
                         MonthsAndDaysAdapter adapter = new MonthsAndDaysAdapter(months, Revenue.this);
                         recyclerView.setAdapter(adapter);
                     }
@@ -100,7 +104,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
             });
 
         } else if (getIntent().getBooleanExtra(Common.DAY, false)) {
-            Firebase.getMonth(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getMonth(this, getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<MonthAndDay> days = new ArrayList<>();
 
                 @Override
@@ -113,6 +117,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
                     }
 
                     if (!days.isEmpty()) {
+                        Collections.reverse(days);
                         MonthsAndDaysAdapter adapter = new MonthsAndDaysAdapter(days, Revenue.this);
                         recyclerView.setAdapter(adapter);
                     }
@@ -125,7 +130,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
         } else if (getIntent().getBooleanExtra(Common.DEVICE, false)) {
             isDevice = true;
-            Firebase.getDay(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getDay(this, getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<YearAndDevice> devices = new ArrayList<>();
 
                 @Override
@@ -150,7 +155,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
         } else if (getIntent().getBooleanExtra(Common.DEVICE_DETAILS, false)) {
             String[] date = new String[]{getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE), getIntent().getStringExtra(Common.DEVICE_NUMBER)};
-            Firebase.getDevice(getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE), getIntent().getStringExtra(Common.DEVICE_NUMBER)).addListenerForSingleValueEvent(new ValueEventListener() {
+            Firebase.getDevice(this, getIntent().getStringExtra(Common.YEAR_VALUE), getIntent().getStringExtra(Common.MONTH_VALUE), getIntent().getStringExtra(Common.DAY_VALUE), getIntent().getStringExtra(Common.DEVICE_NUMBER)).addListenerForSingleValueEvent(new ValueEventListener() {
                 final List<RevenueDeviceData> devices = new ArrayList<>();
 
                 @Override
@@ -163,7 +168,7 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
                     }
 
                     if (!devices.isEmpty()) {
-                        DeviceDetailsAdapter adapter = new DeviceDetailsAdapter(devices, Revenue.this, date);
+                        DeviceDetailsAdapter adapter = new DeviceDetailsAdapter(Revenue.this, devices, Revenue.this, date);
                         recyclerView.setAdapter(adapter);
                     }
                 }
@@ -198,17 +203,18 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.change_password) {
-            Password password = new Password(password1 -> ConfirmationDialog.show(this, getString(R.string.password_confirmation).concat(" \"").concat(password1).concat("\" ").concat(getString(R.string.password_confirmation_1)), new ConfirmationDialog.ConfirmationDialogListener() {
+            Password password = new Password((password1, isRememberMe) -> ConfirmationDialog.show(this, getString(R.string.password_confirmation).concat(" \"").concat(password1).concat("\" ").concat(getString(R.string.password_confirmation_1)), new ConfirmationDialog.ConfirmationDialogListener() {
                 @Override
                 public void onConfirm() {
                     try {
                         if (Internet.isConnected(Revenue.this)) {
-                            getSharedPreferences(Common.SHARED_PREFERENCE_NAME, MODE_PRIVATE)
+                            getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE)
                                     .edit()
                                     .putString(Common.USER_PASSWORD, password1)
+                                    .putBoolean(Common.REMEMBER_ME, isRememberMe)
                                     .apply();
 
-                            Firebase.getRoot().child("password").setValue(EncryptionAndDecryption.encrypt(password1));
+                            Firebase.getRoot(Revenue.this).child("password").setValue(EncryptionAndDecryption.encrypt(password1));
                         }
                     } catch (Exception ignored) {
                     }
@@ -216,13 +222,22 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
                 @Override
                 public void onCancel() {
-
                 }
             }));
 
             password.show(getSupportFragmentManager(), "password_dialog");
 
             return true;
+        } else if (item.getItemId() == R.id.remember_me_remover) {
+            try {
+                getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE)
+                        .edit()
+                        .remove(Common.REMEMBER_ME)
+                        .apply();
+
+                Toast.makeText(this, getString(R.string.done), Toast.LENGTH_SHORT).show();
+            } catch (Exception ignored) {
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -261,6 +276,11 @@ public class Revenue extends AppCompatActivity implements ViewOnClickListener {
 
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void openProfile(String id) {
+
     }
 
     @Override

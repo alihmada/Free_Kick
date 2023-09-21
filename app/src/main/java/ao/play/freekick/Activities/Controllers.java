@@ -1,108 +1,70 @@
 package ao.play.freekick.Activities;
 
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
+import android.util.TypedValue;
+import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-import com.journeyapps.barcodescanner.ScanContract;
-import com.journeyapps.barcodescanner.ScanOptions;
+import com.google.android.material.tabs.TabLayout;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import ao.play.freekick.Adapters.ControllersAdapter;
-import ao.play.freekick.Classes.Capture;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
-import ao.play.freekick.Data.Firebase;
+import ao.play.freekick.Adapters.FragmentViewPagerAdapter;
+import ao.play.freekick.Fragments.Buttons;
+import ao.play.freekick.Fragments.Inside;
+import ao.play.freekick.Fragments.Outside;
 import ao.play.freekick.Models.Common;
-import ao.play.freekick.Models.Controller;
 import ao.play.freekick.R;
 
 public class Controllers extends AppCompatActivity {
-    RecyclerView recyclerView;
-    ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
-        if (result.getContents() != null) {
-            String code = null;
-            try {
-                code = EncryptionAndDecryption.decrypt(result.getContents());
-            } catch (Exception ignored) {
-                Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
-            }
-
-            assert code != null;
-            if (code.matches("controller\\d+")) {
-
-                getScannedController(code);
-            }
-        }
-    }); // End of registerForActivityResult()
+    TabLayout tabLayout;
+    ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controllers);
 
-        setCustomActionBar();
+        Objects.requireNonNull(getSupportActionBar()).hide();
+        getWindow().setStatusBarColor(getPrimaryColor());
 
-        recyclerView = findViewById(R.id.controllers_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        setupHeader();
 
-        getScannedController(getIntent().getStringExtra(Common.CODE));
+        setupViewPager();
     } // End of onCreate()
 
-    private void setCustomActionBar() {
-        Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.tool_bar);
-    } // End of setCustomActionBar()
+    private void setupHeader() {
+        TextView id = findViewById(R.id.id);
+        id.setText(ao.play.freekick.Fragments.Controllers.controller.getId());
 
-    private void getScannedController(String controller) {
-        List<Controller> controllers = new ArrayList<>();
+        TextView name = findViewById(R.id.name);
+        String controllerId = getIntent().getStringExtra(Common.ID);
+        name.setText(String.format("%s %s", getString(R.string.controller_no), controllerId));
 
-        Firebase.getController().child(controller).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                controllers.add(snapshot.getValue(Controller.class));
+        TextView time = findViewById(R.id.time);
+        time.setText(ao.play.freekick.Fragments.Controllers.controller.getTimeOfLastRepair());
+    }
 
-                ControllersAdapter adapter = new ControllersAdapter(controllers);
-                recyclerView.setAdapter(adapter);
-            }
+    private void setupViewPager() {
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+        tabLayout.setupWithViewPager(viewPager);
 
-            }
-        });
-    } // End of getScannedController()
+        FragmentViewPagerAdapter ordersViewPagerAdapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        ordersViewPagerAdapter.addFragment(new Buttons(), getString(R.string.buttons));
+        ordersViewPagerAdapter.addFragment(new Outside(), getString(R.string.outside));
+        ordersViewPagerAdapter.addFragment(new Inside(), getString(R.string.inside));
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.controller_menu, menu);
-        return true;
-    } // End of onCreateOptionsMenu()
+        viewPager.setAdapter(ordersViewPagerAdapter);
+    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-
-        if (itemId == R.id.scan) {
-            ScanOptions scanOptions = new ScanOptions();
-            scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
-            scanOptionsActivityResultLauncher.launch(scanOptions);
-        }
-        return super.onOptionsItemSelected(item);
-
-    } // End of onOptionsItemSelected()
-
+    private int getPrimaryColor() {
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+        return typedValue.data;
+    }
 } // End of Controllers()

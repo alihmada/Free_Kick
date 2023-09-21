@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,14 +10,16 @@
         android:id="@+id/card_view"
         style="@style/cardViewStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="170dp"
             android:background="@drawable/debt" />
     </com.google.android.material.card.MaterialCardView>
-
 
     <EditText
         android:id="@+id/search_view"
@@ -25,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/card_view"
         android:layout_marginStart="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
         android:layout_marginEnd="@dimen/margin"
         android:autofillHints=""
         android:background="@drawable/search_style"
@@ -32,32 +35,70 @@
         android:drawablePadding="@dimen/padding"
         android:hint="@string/search"
         android:inputType="text"
-        android:padding="12dp" />
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/debt_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_below="@+id/search_view"
-        android:layout_marginStart="@dimen/margin"
         android:layout_marginTop="@dimen/margin"
-        android:layout_marginEnd="@dimen/margin"
-        android:layout_marginBottom="@dimen/margin"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="@dimen/padding"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_view" />
 
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_customer"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/alert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
         android:clickable="true"
-        android:backgroundTint="?attr/colorPrimary"
-        android:contentDescription="@string/add_new_customer"
-        app:srcCompat="@drawable/plus_icon" />
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_view">
 
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/alert_image"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:src="@drawable/no_data"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/alert_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:text="@string/data_not_found"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/alert_image"
+            app:layout_constraintStart_toStartOf="@+id/alert_image"
+            app:layout_constraintTop_toBottomOf="@+id/alert_image" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:indeterminateTint="?attr/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

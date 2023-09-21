@@ -1,118 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.DebtDetails">
+    tools:context=".Activities.DebtorData">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_view"
-        style="@style/cardViewStyle"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout4"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="140dp"
+        android:background="@drawable/user_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/letter"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="24dp"
+            android:background="@drawable/user_view_text"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tab_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/user_name"
+            style="@style/single_line"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            android:textSize="@dimen/text_size"
+            android:textStyle="normal"
+            app:layout_constraintBottom_toBottomOf="@+id/letter"
+            app:layout_constraintStart_toEndOf="@+id/letter"
+            app:layout_constraintTop_toTopOf="@+id/letter" />
 
-            <TextView
-                android:id="@+id/dept_details_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <ImageButton
+            android:id="@+id/add_data"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/add_button_background"
+            app:layout_constraintBottom_toBottomOf="@+id/letter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/letter"
+            app:srcCompat="@drawable/plus_icon" />
 
-            <TextView
-                android:id="@+id/dept_details_for_me"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="50dp"
-                android:layout_marginBottom="16dp"
-                android:textColor="@color/green"
-                android:textSize="35sp"
-                app:drawableEndCompat="@drawable/arrow_downward"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dept_details_name" />
-
-            <TextView
-                android:id="@+id/dept_details_for_you"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="16dp"
-                android:textColor="@color/red"
-                android:textSize="35sp"
-                app:drawableEndCompat="@drawable/arrow_upward"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dept_details_name" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/debt_details_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/cd"
-        android:layout_below="@+id/card_view"
-        android:layout_marginStart="@dimen/margin"
-        android:layout_marginTop="@dimen/margin"
-        android:layout_marginEnd="@dimen/margin"
-        android:layout_marginBottom="@dimen/margin"
-        android:background="@drawable/debt"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cd"
-        style="@style/cardViewStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-        <LinearLayout
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:tabIndicatorColor="@color/tab"
+            app:tabIndicatorHeight="4dp"
+            app:tabRippleColor="@android:color/transparent"
+            app:tabSelectedTextColor="@color/tab_selected_text_color"
+            app:tabTextAppearance="@style/CustomTabTextAppearance"
+            app:tabTextColor="@color/tab_text_color">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/for_you"
-                style="@style/buttonStyle"
+            <com.google.android.material.tabs.TabItem
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin"
-                android:layout_weight="1"
-                android:backgroundTint="@color/red"
-                android:text="@string/for_him"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/for_me"
-                style="@style/buttonStyle"
+            <com.google.android.material.tabs.TabItem
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin"
-                android:layout_weight="1"
-                android:backgroundTint="@color/green"
-                android:text="@string/for_you"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:layout_height="wrap_content" />
 
-    </com.google.android.material.card.MaterialCardView>
-</RelativeLayout>
+        </com.google.android.material.tabs.TabLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

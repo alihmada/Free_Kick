@@ -6,4 +6,9 @@
         android:icon="@drawable/lock"
         android:title="@string/change_password"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/remember_me_remover"
+        android:icon="@drawable/remember_me"
+        android:title="@string/remember_me"
+        app:showAsAction="ifRoom" />
 </menu>

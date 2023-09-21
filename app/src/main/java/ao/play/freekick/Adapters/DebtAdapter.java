@@ -34,7 +34,7 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.ViewHolder> im
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.debt_customer, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.customer_controller_row, parent, false);
         return new DebtAdapter.ViewHolder(view, onClickListener);
     }
 
@@ -44,8 +44,6 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.ViewHolder> im
 
         holder.letter.setText(String.valueOf(name.charAt(0)));
         holder.name.setText(name);
-        holder.forMe.setText(filteredCustomers.get(position).getForMe());
-        holder.forYou.setText(filteredCustomers.get(position).getForYou());
     }
 
     @Override
@@ -93,16 +91,15 @@ public class DebtAdapter extends RecyclerView.Adapter<DebtAdapter.ViewHolder> im
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView letter, name, forMe, forYou;
+        public TextView letter, name;
 
         public ViewHolder(@NonNull View itemView, ViewOnClickListener viewOnClickListener) {
             super(itemView);
 
             letter = itemView.findViewById(R.id.letter);
             name = itemView.findViewById(R.id.debt_name);
-            forMe = itemView.findViewById(R.id.for_me);
-            forYou = itemView.findViewById(R.id.for_you);
 
+            letter.setOnClickListener(view -> viewOnClickListener.openProfile(filteredCustomers.get(getAdapterPosition()).getId()));
             itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(filteredCustomers.get(getAdapterPosition()).getId()));
         }
     }

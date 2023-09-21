@@ -1,5 +1,6 @@
 package ao.play.freekick.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,13 @@ import ao.play.freekick.Models.RevenueDeviceData;
 import ao.play.freekick.R;
 
 public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdapter.ViewHolder> {
+    private final Context context;
     private final List<RevenueDeviceData> deviceData;
     private final ViewOnClickListener onClickListener;
     private final String[] date;
 
-    public DeviceDetailsAdapter(List<RevenueDeviceData> deviceData, ViewOnClickListener viewOnClickListener, String[] date) {
+    public DeviceDetailsAdapter(Context context, List<RevenueDeviceData> deviceData, ViewOnClickListener viewOnClickListener, String[] date) {
+        this.context = context;
         this.deviceData = deviceData;
         this.onClickListener = viewOnClickListener;
         this.date = date;
@@ -62,7 +65,7 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
     }
 
     public void removeItem(int position) {
-        DatabaseReference year = Firebase.getYear(date[0]);
+        DatabaseReference year = Firebase.getYear(context, date[0]);
         DatabaseReference month = Firebase.getMonth(year, date[1]);
         DatabaseReference day = Firebase.getDay(month, date[2]);
         DatabaseReference device = Firebase.getDevice(day, date[3]);
@@ -70,7 +73,7 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
         Query query = device.orderByChild("start").equalTo(deviceData.get(position).getStart());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
-            final DatabaseReference year = Firebase.getYear(date[0]);
+            final DatabaseReference year = Firebase.getYear(context, date[0]);
             final DatabaseReference month = Firebase.getMonth(year, date[1]);
             final DatabaseReference day = Firebase.getDay(month, date[2]);
             final DatabaseReference device = Firebase.getDevice(day, date[3]);

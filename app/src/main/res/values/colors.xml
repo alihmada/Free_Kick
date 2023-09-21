@@ -9,6 +9,7 @@
 
     <!-- hint color -->
     <color name="sonic_silver">#7A7A7A</color>
+    <color name="silver">#B4B4B4</color>
 
     <color name="dim_gray">#696969</color>
     <color name="off">#FAFAFA</color>
@@ -19,6 +20,5 @@
 
 
     <color name="red">#FF0000</color>
-    <color name="green">#44FF00</color>
 
 </resources>

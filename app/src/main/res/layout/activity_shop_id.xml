@@ -6,80 +6,139 @@
     android:layout_height="match_parent"
     tools:context=".Activities.ShopID">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/image_view"
-        android:contentDescription="@string/app_name"
-        android:padding="@dimen/padding"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layoutDirection="ltr"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/baseline_person" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        style="@style/general_text_input_layout"
+        <androidx.cardview.widget.CardView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_margin="2dp"
+            android:backgroundTint="#F2F3F6"
+            app:cardCornerRadius="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardView"
+                android:layout_width="142dp"
+                android:layout_height="142dp"
+                android:layout_margin="4dp"
+                app:cardCornerRadius="500dp">
+
+                <ImageView
+                    android:id="@+id/user_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/select_image"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/change_user_photo"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:layout_margin="2dp"
+                android:backgroundTint="#F2F3F6"
+                android:clickable="false"
+                android:focusable="false"
+                app:cardCornerRadius="50dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/camera" />
+            </androidx.cardview.widget.CardView>
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <EditText
+        android:id="@+id/first_name"
+        style="@style/edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        app:placeholderText="@string/user_name">
+        android:layout_height="@dimen/components_height"
+        android:layout_marginTop="50dp"
+        android:hint="@string/first_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout6" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/user_name_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/user_name"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout2"
-        style="@style/general_text_input_layout"
+    <EditText
+        android:id="@+id/last_name"
+        style="@style/edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout"
-        app:layout_constraintStart_toStartOf="@+id/textInputLayout"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
-        app:placeholderText="@string/shop_id">
+        android:layout_height="@dimen/components_height"
+        android:layout_marginTop="@dimen/margin"
+        android:hint="@string/last_name"
+        app:layout_constraintEnd_toEndOf="@+id/first_name"
+        app:layout_constraintStart_toStartOf="@+id/first_name"
+        app:layout_constraintTop_toBottomOf="@+id/first_name" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/shop_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="@string/shop_id"
-            android:inputType="text" />
-
-    </com.google.android.material.textfield.TextInputLayout>
+    <EditText
+        android:id="@+id/shop_id"
+        style="@style/edit_text"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/components_height"
+        android:hint="@string/shop_id"
+        app:layout_constraintEnd_toStartOf="@+id/qr_scanner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/last_name" />
 
     <ImageButton
         android:id="@+id/qr_scanner"
-        style="@style/buttonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/login"
+        android:layout_width="@dimen/components_height"
+        android:layout_height="@dimen/components_height"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_marginEnd="@dimen/margin"
+        android:background="@drawable/button_ripple_effect"
+        android:gravity="center"
+        android:shadowColor="@color/dim_gray"
         android:src="@drawable/scanner_icon"
-        app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/last_name" />
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/getMain"
-        style="@style/buttonStyle"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="36dp"
-        android:contentDescription="@string/login"
-        android:src="@drawable/baseline_arrow_forward"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginHorizontal="@dimen/margin"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/button_ripple_effect"
+        android:gravity="center"
+        android:shadowColor="@color/dim_gray"
+        android:text="@string/tracking"
+        android:textSize="@dimen/text_size"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shop_id" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

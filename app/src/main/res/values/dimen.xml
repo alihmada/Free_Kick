@@ -8,5 +8,12 @@
     <dimen name="card_corner_radius">15dp</dimen>
     <dimen name="card_elevation">15dp</dimen>
     <dimen name="horizontal_padding">30dp</dimen>
-    <dimen name="corner_size">19dp</dimen>
+    <dimen name="corner_size">20dp</dimen>
+    <dimen name="components_height">60dp</dimen>
+
+    <dimen name="app_bar_radius">20dp</dimen>
+
+    <dimen name="bottom_sheet_radius">40dp</dimen>
+
+    <dimen name="bottom_sheet_padding">20dp</dimen>
 </resources>

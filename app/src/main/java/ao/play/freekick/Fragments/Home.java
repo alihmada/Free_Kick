@@ -1,42 +1,109 @@
 package ao.play.freekick.Fragments;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import ao.play.freekick.Activities.Controllers;
+import ao.play.freekick.Activities.Main;
 import ao.play.freekick.Adapters.HomeAdapter;
+import ao.play.freekick.Classes.Capture;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
+import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.DataCollector;
+import ao.play.freekick.Data.Firebase;
+import ao.play.freekick.Dialogs.Loading;
+import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Interfaces.ViewListener;
+import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
 
 public class Home extends Fragment implements ViewListener {
     public static RecyclerView recyclerView;
+    SharedPreferences sharedPreferences;
+    Gson gson;
+    ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null) {
+            String code = null;
+            try {
+                code = EncryptionAndDecryption.decrypt(result.getContents());
+            } catch (Exception ignored) {
+                Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
+            }
+
+            if (code != null) {
+                if (code.matches("controller\\d+")) {
+
+                    Intent intent = new Intent(requireContext(), Controllers.class);
+                    intent.putExtra(Common.CODE, code);
+
+                    startActivity(intent);
+
+                } else {
+                    List<Device> devices = Arrays.asList(gson.fromJson(code, Device[].class));
+
+                    for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
+                        languageHandler(devices.get(i), i);
+                    }
+
+                    HomeAdapter adapter = new HomeAdapter(requireContext(), devices, this);
+                    Home.recyclerView.setAdapter(adapter);
+                }
+            }
+        }
+    }); // End of registerForActivityResult()
     private Vibrator vibrator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        try {
+            sharedPreferences = requireActivity().getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+        } catch (Exception ignored) {
+        }
+
+        gson = new Gson();
+
         recyclerView = view.findViewById(R.id.home_recycler);
 
         DataCollector.collect(requireContext());
@@ -57,6 +124,89 @@ public class Home extends Fragment implements ViewListener {
     private void setupVibrator() {
         vibrator = (Vibrator) requireContext().getSystemService(Context.VIBRATOR_SERVICE);
     }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.upload) {
+            Device[] devices = new Device[Common.DEVICES_NUMBER];
+
+            for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
+                if (gson.fromJson(sharedPreferences.getString(String.valueOf(i), ""), Device.class) != null)
+                    devices[i] = gson.fromJson(sharedPreferences.getString(String.valueOf(i), ""), Device.class);
+                else devices[i] = new Device(null, "", "", 8, 0, true, false, false);
+            }
+
+            Firebase.upload(devices, requireContext());
+
+            return true;
+        } else if (item.getItemId() == R.id.download) {
+            download();
+            return true;
+        } else if (item.getItemId() == R.id.qr) {
+
+            DataCollector.collect(requireContext());
+
+            Main.createQR(requireContext(), DataCollector.getData());
+            return true;
+        } else if (item.getItemId() == R.id.scanner) {
+
+            ScanOptions scanOptions = new ScanOptions();
+            scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
+            scanOptionsActivityResultLauncher.launch(scanOptions);
+
+            return true;
+        } else if (item.getItemId() == R.id.delAll) {
+            List<Device> devices = new ArrayList<>();
+
+            for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
+                devices.add(null);
+
+                sharedPreferences.edit().putString(String.format("h%s", i), sharedPreferences.getString(String.valueOf(i), "")).apply();
+                sharedPreferences.edit().putString(String.valueOf(i), null).apply();
+            }
+
+            HomeAdapter adapter = new HomeAdapter(requireContext(), devices, this);
+            Home.recyclerView.setAdapter(adapter);
+
+            return true;
+        } else if (item.getItemId() == R.id.exit) {
+            requireActivity().finish();
+            return true;
+        } else return super.onOptionsItemSelected(item);
+    }
+
+    private void download() {
+        Loading.showProgressDialog();
+        if (!Internet.isConnected(requireContext())) Loading.dismissProgressDialog();
+
+        Firebase.getRoot(requireContext()).child(Common.DEVICE).addListenerForSingleValueEvent(new ValueEventListener() {
+            final List<Device> deviceList = new ArrayList<>();
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    deviceList.add(dataSnapshot.getValue(Device.class));
+                }
+
+                if (deviceList.size() != 0) {
+                    HomeAdapter adapter = new HomeAdapter(requireContext(), deviceList, Home.this);
+                    Home.recyclerView.setAdapter(adapter);
+                    Loading.dismissProgressDialog();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    } // End of download()
 
     @Override
     public void languageHandler(Device device, int position) {
@@ -84,7 +234,7 @@ public class Home extends Fragment implements ViewListener {
     }
 
     @Override
-    public void popTimePicker(TextInputEditText textInputEditText) {
+    public void popTimePicker(EditText textInputEditText) {
         MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(LocalTime.now().getHour())

@@ -6,6 +6,10 @@
         android:icon="@drawable/outline_home_icon"
         android:title="@string/home" />
     <item
+        android:id="@+id/controllers"
+        android:icon="@drawable/stadia_controller"
+        android:title="@string/controllers" />
+    <item
         android:id="@+id/debt"
         android:icon="@drawable/account_balance_wallet_outline"
         android:title="@string/Debt" />
@@ -13,9 +17,5 @@
         android:id="@+id/account"
         android:icon="@drawable/outline_account_circle_icon"
         android:title="@string/Account" />
-    <!--<item-->
-    <!--        android:id="@+id/more"-->
-    <!--        android:title="@string/More"-->
-    <!--        android:icon="@drawable/menu"/>-->
 
 </menu>

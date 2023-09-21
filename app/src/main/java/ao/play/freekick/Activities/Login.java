@@ -2,15 +2,27 @@ package ao.play.freekick.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.textfield.TextInputEditText;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.hbb20.CountryCodePicker;
+
 import java.util.Objects;
+
 import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
 
 public class Login extends AppCompatActivity {
+    CountryCodePicker countryCodePicker;
+    ConstraintLayout inputText;
+    boolean isError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,18 +31,68 @@ public class Login extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 
-        ImageButton login = findViewById(R.id.login);
-        TextInputEditText phone = findViewById(R.id.mobile_text);
+        inputText = findViewById(R.id.constraintLayout2);
+
+        View view4 = findViewById(R.id.view4);
+
+        countryCodePicker = findViewById(R.id.login_countryCodePicker);
+
+        Button login = findViewById(R.id.login);
+        EditText phone = findViewById(R.id.mobile_text);
+
+        phone.setOnFocusChangeListener((view, isFocus) -> {
+            if (isFocus) {
+                if (!isError) {
+                    changeBackground(R.drawable.blue_stroke_with_2dp_width);
+                    view4.setBackgroundColor(getPrimaryColor());
+                } else {
+                    changeBackground(R.drawable.red_stroke_with_2dp_width);
+                    view4.setBackgroundColor(getColor(R.color.red));
+                }
+            } else {
+                changeBackground(R.drawable.input_filed);
+                view4.setBackgroundColor(getColor(R.color.red));
+            }
+        });
 
         login.setOnClickListener(view -> {
             String phoneNo = String.valueOf(phone.getText());
-            if (phoneNo.matches("^01[0125][0-9]{8}$")) {
-                Intent intent = new Intent(this, CodeVerification.class);
-                intent.putExtra(Common.PHONE_NUMBER, "+2".concat(phoneNo));
-                startActivity(intent);
+            if (countryCodePicker.getSelectedCountryNameCode().equals("EG")) {
+                if (phoneNo.matches("^01[0125][0-9]{8}$")) {
+                    Intent intent = new Intent(this, CodeVerification.class);
+                    intent.putExtra(Common.PHONE_NUMBER, normalizePhoneNumber(phoneNo));
+                    startActivity(intent);
+                } else {
+                    isError = true;
+                    Toast.makeText(this, getString(R.string.invalid_phone_no), Toast.LENGTH_LONG).show();
+                    changeBackground(R.drawable.red_stroke_with_1dp_width);
+                    view4.setBackgroundColor(getColor(R.color.red));
+                }
             } else {
-                Toast.makeText(this, getString(R.string.invalid_phone_no), Toast.LENGTH_LONG).show();
+                isError = true;
+                Toast.makeText(this, getString(R.string.invalid_country_code), Toast.LENGTH_LONG).show();
+                changeBackground(R.drawable.red_stroke_with_1dp_width);
+                view4.setBackgroundColor(getColor(R.color.red));
             }
         });
+    }
+
+    private void changeBackground(int stroke) {
+        inputText.setBackground(AppCompatResources.getDrawable(this, stroke));
+    }
+
+    private int getPrimaryColor() {
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true);
+        return typedValue.data;
+    }
+
+    private String normalizePhoneNumber(String phone) {
+        if (phone.matches("^1[0125][0-9]{8}$")) {
+            return String.format("%s%s", countryCodePicker.getSelectedCountryCodeWithPlus(), phone);
+        } else if (phone.matches("^01[0125][0-9]{8}$")) {
+            return String.format("%s%s", countryCodePicker.getSelectedCountryCodeWithPlus(), phone.substring(1));
+        }
+        return null;
     }
 }

@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Free Kick</string>
 
+    <!-- Login -->
+    <string name="tracking">Continue</string>
+    <string name="phone_hint" translatable="false">01 xxx xxx xxxx</string>
+
     <!-- controllers -->
 
     <string name="txtStarting">Starting Time</string>
@@ -100,12 +104,15 @@
 
     <string name="error_in_inputs">Please, check your inputs</string>
 
+    <string name="error_in_image">Please, choose an image</string>
+
     <!-- save -->
 
     <string name="save_message_when_device_empty">Can not save, please check your inputs</string>
 
     <!-- notifications -->
 
+    <string name="ask_user_notification_permission">Notifications must be enabled</string>
     <string name="notification_content">The device must be evacuated</string>
     <string name="notification_title">is finished</string>
     <string name="required_to_be_paid">Required to be paid is</string>
@@ -120,7 +127,10 @@
 
     <!-- password dialog -->
 
-    <string name="password">Enter your password</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="show_password">Show password</string>
+    <string name="remember_me">Remember me</string>
     <string name="submit">Submit</string>
     <string name="use_your_fingerprint">Use your fingerprint</string>
     <string name="free_kick_verify">Free kick needs to verify it\'s you</string>
@@ -128,7 +138,7 @@
 
     <!-- customer name -->
 
-    <string name="customer_name">Enter value</string>
+    <string name="customer_name">Enter customer name</string>
 
     <!-- progress dialog -->
 
@@ -137,6 +147,7 @@
     <!-- internet -->
 
     <string name="no_internet">No internet connection</string>
+    <string name="internet_limited">Internet connection limited</string>
     <string name="data_uploaded">Data uploaded</string>
     <string name="data_download">Downloaded successfully</string>
 
@@ -148,6 +159,8 @@
     <string name="devices">Devices</string>
     <string name="device_number">Device number</string>
 
+    <string name="done">Your password not remembered now</string>
+
     <!-- saved -->
 
     <string name="saved">Saved</string>
@@ -155,33 +168,73 @@
 
     <!-- controllers -->
 
-    <string name="id">ID</string>
-    <string name="time_of_last_repairing">Time of last repairing</string>
+    <string name="ps4_controller_dpad_up">Up</string>
+    <string name="ps4_controller_dpad_down">Down</string>
+    <string name="ps4_controller_dpad_left">Left</string>
+    <string name="ps4_controller_dpad_right">Right</string>
+
+    <string name="ps4_controller_button_circle">Circle</string>
+    <string name="ps4_controller_button_square">Square</string>
+    <string name="ps4_controller_button_triangle">Triangle</string>
+    <string name="ps4_controller_button_cross">Cross</string>
+
+    <string name="ps4_controller_button_l1">L1</string>
+    <string name="ps4_controller_button_l2">L2</string>
+    <string name="ps4_controller_button_r1">R1</string>
+    <string name="ps4_controller_button_r2">R2</string>
+
+    <string name="ps4_controller_button_share">Share</string>
+    <string name="ps4_controller_button_options">Options</string>
+    <string name="ps4_controller_button_ps">PS</string>
+    <string name="ps4_controller_button_touchpad">Touchpad</string>
+
+    <string name="enter_the_problem">Enter the problem</string>
+
+    <string name="buttons">Buttons</string>
+    <string name="outside">From out</string>
+    <string name="inside">From in</string>
+
+    <string name="external_parts">External parts</string>
+    <string name="internal_parts">Internal parts</string>
+
     <string name="body">Body</string>
+
+    <string name="analogs">Analogs</string>
+
     <string name="right_analog">Right analog</string>
     <string name="left_analog">Left analog</string>
+
     <string name="stocks">Stock control unit</string>
-    <string name="xo">Button control unit</string>
-    <string name="option">Option button</string>
-    <string name="share">Share button</string>
-    <string name="table">Table</string>
-    <string name="l1l2">L1 و L2</string>
-    <string name="r1r2">R1 و R2</string>
+    <string name="play_pad">Button control unit</string>
+    <string name="up_buttons">R and L buttons</string>
+    <string name="other_buttons">Other buttons</string>
     <string name="socket">Socket</string>
     <string name="battery">Battery</string>
     <string name="motherboard">Motherboard</string>
     <string name="inner_cable">Inner cable</string>
+    <string name="tap_cable">Tap cable</string>
 
     <string name="error_placeholder">Please, Enter your problem</string>
 
     <string name="save">Save</string>
     <string name="edit">Edit</string>
 
-    <!-- Debt -->
+    <!-- Controllers -->
 
+    <string name="add">Add controller</string>
+    <string name="controller_no">Controller no.</string>
+
+    <string name="good">Good</string>
+    <string name="bad">Bad</string>
+
+    <!-- Debt -->
+    <string name="add_new">Add a new user</string>
+    <string name="sort">Sort data</string>
     <string name="add_new_customer">Add new one</string>
     <string name="search">Search</string>
 
+    <!-- user view -->
+    <string name="data_not_found">No data found</string>
 
     <!-- bottom navigation bar -->
 
@@ -195,6 +248,7 @@
     <string name="login">Login</string>
     <string name="mobile">Mobile No.</string>
     <string name="invalid_phone_no">Please, Enter a valid phone number</string>
+    <string name="invalid_country_code">Please, Choose a valid country code</string>
 
     <!-- code verification -->
     <string name="otp">OTP</string>
@@ -202,10 +256,15 @@
     <string name="verification_text">We have sent the code verification</string>
 
     <!-- shop id -->
-    <string name="user_name">User Name</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
     <string name="shop_id">Shop ID</string>
+    <string name="enter_new_name">Enter a new name</string>
 
     <!-- debt -->
+    <string name="debtor_name">Customer name</string>
+    <string name="value_of_debt">Enter the value of the debt</string>
+    <string name="delete_account">Delete account</string>
     <string name="for_him">For him</string>
     <string name="for_you">For you</string>
     <string name="user_exist">This user already exist</string>
@@ -223,4 +282,7 @@
     <string name="password_confirmation">Are you sure want </string>
     <string name="password_confirmation_1">password for your account?</string>
 
+    <!-- account -->
+    <string name="logout">Logout</string>
+    <string name="phone_number">Phone</string>
 </resources>

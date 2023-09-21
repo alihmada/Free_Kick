@@ -20,6 +20,39 @@
 
     <style name="Theme.FreeKick" parent="Base.Theme.FreeKick" />
 
+    <color name="input_field_stroke">@color/sonic_silver</color>
+    <color name="account_filed">#99E0E3EA</color>
+
+    <color name="remove">#929292</color>
+    <color name="bottom_sheet">@color/white</color>
+
+    <color name="tab">#5283FF</color>
+
+    <color name="tab_selected_text_color">@color/black</color>
+    <color name="tab_text_color">#80000000</color>
+
+    <color name="green">#B0FFD9</color>
+
+    <style name="general_view">
+        <item name="android:elevation">1dp</item>
+        <item name="android:outlineProvider">background</item>
+        <item name="android:translationZ">1dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="otp_edit_text_without_margin" parent="general_view">
+        <item name="android:background">@drawable/input_filed</item>
+        <item name="android:inputType">number</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLength">1</item>
+    </style>
+
+    <style name="otp_edit_text" parent="otp_edit_text_without_margin">
+        <item name="android:layout_marginHorizontal">5dp</item>
+    </style>
+
     <style name="cardViewStyle" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">@dimen/card_corner_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
@@ -39,7 +72,6 @@
     </style>
 
     <style name="spinnerStyle">
-        <item name="fontFamily">@font/metropolis_regular</item>
         <item name="android:layout_margin">@dimen/margin</item>
         <item name="android:padding">@dimen/padding</item>
         <item name="android:spinnerMode">dropdown</item>
@@ -49,8 +81,20 @@
         <item name="android:visibility">gone</item>
     </style>
 
+    <style name="edit_text">
+        <item name="android:inputType">text|datetime</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/input_filed</item>
+        <item name="android:layout_marginTop">@dimen/margin</item>
+        <item name="android:layout_marginStart">@dimen/margin</item>
+        <item name="android:layout_marginEnd">@dimen/margin</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingVertical">12dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+    </style>
+
     <style name="radioButtonGroupStyle">
-        <item name="android:padding">@dimen/padding</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
@@ -90,6 +134,7 @@
     <style name="selectedItemStyle">
         <item name="android:textSize">@dimen/text_size</item>
         <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">center</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -140,5 +185,31 @@
 
     <style name="recyclerview">
         <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="dialog_animation">
+        <item name="android:windowEnterAnimation">@anim/slide_in_animation</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_animation</item>
+    </style>
+
+    <style name="CustomTabTextAppearance">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="single_line">
+        <item name="android:maxLength">25</item>
+        <item name="android:ellipsize">end</item>
+        <item name="singleLine">true</item>
+    </style>
+
+    <style name="not_focusable_clickable">
+        <item name="android:focusable">false</item>
+        <item name="android:clickable">false</item>
+    </style>
+
+    <style name="focusable_clickable">
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
     </style>
 </resources>

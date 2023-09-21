@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">ضربة حرة</string>
 
+    <!-- Login -->
+    <string name="tracking">متابعة</string>
+
     <!-- controllers -->
 
     <string name="txtStarting">وقت البداية</string>
@@ -86,10 +89,14 @@
     <!-- -->
     <string name="error_in_inputs">من فضلك راجع البيانات المدخلة</string>
 
+    <string name="error_in_image">من فضلك قم بإختيار صورة</string>
+
     <!-- save -->
     <string name="save_message_when_device_empty">لا يمكن حفظ البيانات ، من فضلك راجع البيانات المدخلة</string>
 
     <!-- Notifications -->
+
+    <string name="ask_user_notification_permission">يجب تمكين الإشعارات</string>
     <string name="notification_content">قم بإيقاف تشغيل الجهاز</string>
     <string name="notification_title">انتهى وقته</string>
     <string name="required_to_be_paid">المطلوب دفعه هو</string>
@@ -104,17 +111,22 @@
     <string name="loading">جارى التحميل…</string>
 
     <!-- password dialog -->
-    <string name="password">ادخل كلمة المرور</string>
+
+    <string name="password">كلمة المرور</string>
+    <string name="enter_password">ادخل كلمة المرور</string>
+    <string name="show_password">إظهار كلمة المرور</string>
+    <string name="remember_me">تذكرنى</string>
     <string name="submit">تأكيد</string>
     <string name="use_your_fingerprint">استخدم بصمة إصبعك</string>
     <string name="free_kick_verify">ضربة حرة يحتاج إلى التحقق من هويتك</string>
     <string name="cancel">إلغاء</string>
 
     <!-- customer name -->
-    <string name="customer_name">ادخل قيمة</string>
+    <string name="customer_name">ادخل اسم العميل</string>
 
     <!-- internet -->
     <string name="no_internet">خطأ فى الإتصال بالإنترنت</string>
+    <string name="internet_limited">سرعة الإتصال محدودة</string>
     <string name="data_uploaded">تم رفع البيانات بنجاح</string>
     <string name="data_download">تم تنزيل البيانات بنجاح</string>
 
@@ -125,39 +137,80 @@
     <string name="devices">الأجهزة</string>
     <string name="device_number">جهاز رقم</string>
 
+    <string name="done">لم تعد كلمة مرورك محفوظة</string>
+
     <!-- saved -->
     <string name="saved">تم الحفظ</string>
 
 
     <!-- controllers -->
 
-    <string name="id">الرقم التعريفى</string>
-    <string name="time_of_last_repairing">متى كان اخر اصلاح؟</string>
+    <string name="ps4_controller_dpad_up">أعلى</string>
+    <string name="ps4_controller_dpad_down">أسفل</string>
+    <string name="ps4_controller_dpad_left">يسار</string>
+    <string name="ps4_controller_dpad_right">يمين</string>
+
+    <string name="ps4_controller_button_circle">دائرة</string>
+    <string name="ps4_controller_button_square">مربع</string>
+    <string name="ps4_controller_button_triangle">مثلث</string>
+    <string name="ps4_controller_button_cross">X</string>
+
+    <string name="ps4_controller_button_l1">L1</string>
+    <string name="ps4_controller_button_l2">L2</string>
+    <string name="ps4_controller_button_r1">R1</string>
+    <string name="ps4_controller_button_r2">R2</string>
+
+    <string name="ps4_controller_button_share">مشاركة</string>
+    <string name="ps4_controller_button_options">خيارات</string>
+    <string name="ps4_controller_button_ps">PS</string>
+    <string name="ps4_controller_button_touchpad">لوحة اللمس</string>
+
+    <string name="enter_the_problem">ادخل المشكلة</string>
+
+    <string name="buttons">الأزرار</string>
+    <string name="outside">من الخارج</string>
+    <string name="inside">من الداخل</string>
+
+    <string name="external_parts">الأجزاء الخارجية</string>
+    <string name="internal_parts">الأجزاء الداخلية</string>
+
     <string name="body">الهيكل الخارجى</string>
+
+    <string name="analogs">الانالوجات</string>
+
     <string name="right_analog">الانالوج اليمين</string>
     <string name="left_analog">الانالوج الشمال</string>
     <string name="stocks">الاسهم</string>
-    <string name="xo">الازرار</string>
-    <string name="option">زر الخيارات</string>
-    <string name="share">زر المشاركة</string>
-    <string name="table">اللوحة الخارجية</string>
-    <string name="l1l2">L1 and L2</string>
-    <string name="r1r2">R1 and R2</string>
+    <string name="play_pad">الازرار</string>
+    <string name="up_buttons">أزرار الـR  و الـ L</string>
+    <string name="other_buttons">أزرار اخرى</string>
     <string name="socket">مدخل الشاحن</string>
     <string name="battery">البطارية</string>
     <string name="motherboard">اللوحة الام</string>
-    <string name="inner_cable">الكابل الداخلى</string>
+    <string name="inner_cable">الشريط الداخلى</string>
+    <string name="tap_cable">شريط لوحة اللمس</string>
 
     <string name="error_placeholder">من فضلك ادخل المشكلة</string>
 
     <string name="save">حفظ</string>
     <string name="edit">تعديل</string>
 
+    <!-- Controllers -->
+
+    <string name="add">إضافة جهاز تحكم</string>
+    <string name="controller_no">وحدة التحكم رقم</string>
+
+    <string name="good">جيد</string>
+    <string name="bad">سئ</string>
 
     <!-- Debt -->
+    <string name="add_new">إضافة مستخدم جديد</string>
+    <string name="sort">ترتيب البيانات</string>
     <string name="add_new_customer">إضافة</string>
     <string name="search">البحث</string>
 
+    <!-- user view -->
+    <string name="data_not_found">لا توجد بيانات للعرض</string>
 
     <!-- bottom navigation bar -->
 
@@ -171,6 +224,7 @@
     <string name="login">تسجيل الدخول</string>
     <string name="mobile">رقم الهاتف</string>
     <string name="invalid_phone_no">قم بادخال رقم هاتف صحيح</string>
+    <string name="invalid_country_code">من فضلك قم بإختيار كود بلد صحيح</string>
 
     <!-- code verification -->
 
@@ -180,11 +234,15 @@
 
     <!-- shop id -->
 
-    <string name="user_name">اسم المستخدم</string>
+    <string name="first_name">الإسم الأول</string>
+    <string name="last_name">الإسم الأخير</string>
     <string name="shop_id">الرقم التعريفى للمحل</string>
+    <string name="enter_new_name">ادخل الإسم الجديد</string>
 
     <!-- debt -->
-
+    <string name="debtor_name">إسم العميل</string>
+    <string name="value_of_debt">أدخل قيمة الدين</string>
+    <string name="delete_account">حذف الحساب</string>
     <string name="for_you">ليك</string>
     <string name="for_him">ليه</string>
     <string name="user_exist">هذا المستخدم موجود بالفعل</string>
@@ -203,4 +261,7 @@
     <string name="password_confirmation">هل أنت متأكد من أنك تريد </string>
     <string name="password_confirmation_1">كلمة مرور لحسابك؟</string>
 
+    <!-- account -->
+    <string name="logout">تسجيل الخروج</string>
+    <string name="phone_number">رقم الهاتف</string>
 </resources>

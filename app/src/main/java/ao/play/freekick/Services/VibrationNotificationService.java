@@ -48,7 +48,18 @@ public class VibrationNotificationService extends Service {
     }
 
     private Notification createNotification(String title, String content) {
-        return new NotificationCompat.Builder(this, Notifications.CHANNEL_ID).setContentTitle(title).setContentText(content).setPriority(NotificationCompat.PRIORITY_HIGH).setCategory(NotificationCompat.CATEGORY_ALARM).setSmallIcon(R.drawable.notification_logo).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_logo)).setContentIntent(Notifications.pendingIntent).setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)).setAutoCancel(true).build();
+        return new NotificationCompat
+                .Builder(this, Notifications.CHANNEL_ID)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setSmallIcon(R.drawable.notification_logo)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.notification_logo))
+                .setContentIntent(Notifications.pendingIntent)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+                .setAutoCancel(true)
+                .build();
     }
 
     @Override
