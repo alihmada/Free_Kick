@@ -81,7 +81,7 @@ public class Splash extends AppCompatActivity {
     private void updateUserData() {
         Query query = Firebase.getUsers(this).orderByChild("phoneNumber").equalTo(Firebase.getPhoneNumber());
 
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {

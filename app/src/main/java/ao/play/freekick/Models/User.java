@@ -1,19 +1,25 @@
 package ao.play.freekick.Models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class User {
+    @SerializedName("firstName")
     private String firstName;
+    @SerializedName("lastName")
     private String lastName;
+    @SerializedName("phoneNumber")
     private String phoneNumber;
-    private boolean isAdmin;
+    @SerializedName("admin")
+    private boolean admin;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, String phoneNumber, boolean isAdmin) {
+    public User(String firstName, String lastName, String phoneNumber, boolean admin) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
-        this.isAdmin = isAdmin;
+        this.admin = admin;
     }
 
     public String getFirstName() {
@@ -29,7 +35,7 @@ public class User {
     }
 
     public boolean isAdmin() {
-        return isAdmin;
+        return admin;
     }
 
 }
