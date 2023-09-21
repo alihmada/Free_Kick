@@ -138,6 +138,7 @@
     <string name="device_number">جهاز رقم</string>
 
     <string name="done">لم تعد كلمة مرورك محفوظة</string>
+    <string name="forget_me">نسيان كلمة المرور</string>
 
     <!-- saved -->
     <string name="saved">تم الحفظ</string>
@@ -250,6 +251,7 @@
     <!-- are you sure dialog -->
 
     <string name="are_you_sure_delete">هل انت متاكد من انك تريد حذف البيانات؟</string>
+    <string name="are_you_sure_logout">هل انت متاكد من انك تريد تسجيل الخروج؟</string>
     <string name="are_you_sure_add">هل انت متاكد من انك تريد اضافة وقت جديد؟</string>
     <string name="are_you_sure_save">هل انت متاكد من انك تريد حفظ البيانات؟</string>
 

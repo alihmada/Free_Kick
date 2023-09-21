@@ -160,6 +160,7 @@
     <string name="device_number">Device number</string>
 
     <string name="done">Your password not remembered now</string>
+    <string name="forget_me">Forget me</string>
 
     <!-- saved -->
 
@@ -271,6 +272,7 @@
 
     <!-- are you sure dialog -->
     <string name="are_you_sure_delete">Are you sure, you want delete data?</string>
+    <string name="are_you_sure_logout">Are you sure, you want logout?</string>
     <string name="are_you_sure_save">Are you sure, you want save data?</string>
     <string name="are_you_sure_add">Are you sure, you want add a new time?</string>
 

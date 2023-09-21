@@ -41,6 +41,7 @@ import ao.play.freekick.Activities.Main;
 import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.BottomSheetDialog;
+import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Models.Common;
 import ao.play.freekick.Models.User;
 import ao.play.freekick.R;
@@ -210,8 +211,18 @@ public class Account extends Fragment {
             Main.createQR(requireContext(), Common.getROOT());
             return true;
         } else if (item.getItemId() == R.id.logout) {
-            sharedPreferences.edit().remove(Common.USER_DATA).remove(Common.SHOP_ID).apply();
-            navigateToLogin();
+            ConfirmationDialog.show(requireContext(), getString(R.string.are_you_sure_logout), new ConfirmationDialog.ConfirmationDialogListener() {
+                @Override
+                public void onConfirm() {
+                    sharedPreferences.edit().remove(Common.USER_DATA).remove(Common.SHOP_ID).apply();
+                    navigateToLogin();
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+            });
             return true;
         } else {
             return super.onOptionsItemSelected(item);

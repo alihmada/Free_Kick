@@ -3,7 +3,6 @@ package ao.play.freekick.Fragments;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +39,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import ao.play.freekick.Activities.Controllers;
 import ao.play.freekick.Activities.Main;
 import ao.play.freekick.Adapters.HomeAdapter;
 import ao.play.freekick.Classes.Capture;
@@ -60,23 +58,16 @@ public class Home extends Fragment implements ViewListener {
     SharedPreferences sharedPreferences;
     Gson gson;
     ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
-        if (result.getContents() != null) {
-            String code = null;
-            try {
-                code = EncryptionAndDecryption.decrypt(result.getContents());
-            } catch (Exception ignored) {
-                Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
-            }
+        try {
+            if (result.getContents() != null) {
+                String code = null;
+                try {
+                    code = EncryptionAndDecryption.decrypt(result.getContents());
+                } catch (Exception ignored) {
+                    Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
+                }
 
-            if (code != null) {
-                if (code.matches("controller\\d+")) {
-
-                    Intent intent = new Intent(requireContext(), Controllers.class);
-                    intent.putExtra(Common.CODE, code);
-
-                    startActivity(intent);
-
-                } else {
+                if (code != null) {
                     List<Device> devices = Arrays.asList(gson.fromJson(code, Device[].class));
 
                     for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
@@ -87,6 +78,7 @@ public class Home extends Fragment implements ViewListener {
                     Home.recyclerView.setAdapter(adapter);
                 }
             }
+        } catch (Exception ignored) {
         }
     }); // End of registerForActivityResult()
     private Vibrator vibrator;
@@ -235,11 +227,7 @@ public class Home extends Fragment implements ViewListener {
 
     @Override
     public void popTimePicker(EditText textInputEditText) {
-        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(LocalTime.now().getHour())
-                .setMinute(LocalTime.now().getMinute())
-                .build();
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder().setTimeFormat(TimeFormat.CLOCK_12H).setHour(LocalTime.now().getHour()).setMinute(LocalTime.now().getMinute()).build();
 
         timePicker.show(getChildFragmentManager(), "timePicker");
 
