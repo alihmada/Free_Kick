@@ -18,20 +18,21 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
+import ao.play.freekick.Classes.Animation;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Interfaces.ViewOnClickListener;
-import ao.play.freekick.Models.Common;
-import ao.play.freekick.Models.RevenueDeviceData;
+import ao.play.freekick.Models.Temporal;
 import ao.play.freekick.R;
 
-public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdapter.ViewHolder> {
+public class TemporalAdapter extends RecyclerView.Adapter<TemporalAdapter.ViewHolder> {
     private final Context context;
-    private final List<RevenueDeviceData> deviceData;
+    private final List<Temporal> deviceData;
     private final ViewOnClickListener onClickListener;
     private final String[] date;
 
-    public DeviceDetailsAdapter(Context context, List<RevenueDeviceData> deviceData, ViewOnClickListener viewOnClickListener, String[] date) {
+    public TemporalAdapter(Context context, List<Temporal> deviceData, ViewOnClickListener viewOnClickListener, String[] date) {
         this.context = context;
         this.deviceData = deviceData;
         this.onClickListener = viewOnClickListener;
@@ -47,7 +48,7 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RevenueDeviceData item = deviceData.get(position);
+        Temporal item = deviceData.get(position);
 
         onClickListener.languageHandler(item);
 
@@ -57,6 +58,8 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
         holder.state.setText(item.getState());
         holder.time.setText(item.getTime());
         holder.price.setText(item.getPrice());
+
+        Animation.startAnimation(holder.itemView);
     }
 
     @Override
@@ -77,26 +80,26 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
             final DatabaseReference month = Firebase.getMonth(year, date[1]);
             final DatabaseReference day = Firebase.getDay(month, date[2]);
             final DatabaseReference device = Firebase.getDevice(day, date[3]);
-            RevenueDeviceData revenueDeviceData;
+            Temporal temporal;
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    revenueDeviceData = dataSnapshot.getValue(RevenueDeviceData.class);
+                    temporal = dataSnapshot.getValue(Temporal.class);
 
                     dataSnapshot.getRef().removeValue();
 
-                    Firebase.deletePrice(device.child(Common.PRICE), revenueDeviceData.getPrice());
-                    Firebase.deleteDuration(device.child(Common.DURATION), revenueDeviceData.getTime());
+                    Firebase.deletePrice(device.child(Common.PRICE), temporal.getPrice());
+                    Firebase.deleteDuration(device.child(Common.DURATION), temporal.getTime());
 
-                    Firebase.deletePrice(day.child(Common.PRICE), revenueDeviceData.getPrice());
-                    Firebase.deleteDuration(day.child(Common.DURATION), revenueDeviceData.getTime());
+                    Firebase.deletePrice(day.child(Common.PRICE), temporal.getPrice());
+                    Firebase.deleteDuration(day.child(Common.DURATION), temporal.getTime());
 
-                    Firebase.deletePrice(month.child(Common.PRICE), revenueDeviceData.getPrice());
-                    Firebase.deleteDuration(month.child(Common.DURATION), revenueDeviceData.getTime());
+                    Firebase.deletePrice(month.child(Common.PRICE), temporal.getPrice());
+                    Firebase.deleteDuration(month.child(Common.DURATION), temporal.getTime());
 
-                    Firebase.deletePrice(year.child(Common.PRICE), revenueDeviceData.getPrice());
-                    Firebase.deleteDuration(year.child(Common.DURATION), revenueDeviceData.getTime());
+                    Firebase.deletePrice(year.child(Common.PRICE), temporal.getPrice());
+                    Firebase.deleteDuration(year.child(Common.DURATION), temporal.getTime());
                 }
 
                 deviceData.remove(position);
@@ -130,7 +133,7 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
 
                 popupMenu.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.delete_debt) {
-                        ConfirmationDialog.show(itemView.getContext(), itemView.getContext().getString(R.string.are_you_sure_delete), new ConfirmationDialog.ConfirmationDialogListener() {
+                        ConfirmationDialog dialog = new ConfirmationDialog(itemView.getContext().getString(R.string.are_you_sure_delete), new ConfirmationDialog.ConfirmationDialogListener() {
                             @Override
                             public void onConfirm() {
                                 removeItem(getAdapterPosition());
@@ -141,6 +144,7 @@ public class DeviceDetailsAdapter extends RecyclerView.Adapter<DeviceDetailsAdap
 
                             }
                         });
+                        dialog.show(dialog.getChildFragmentManager(), "");
                     }
                     return false;
                 });

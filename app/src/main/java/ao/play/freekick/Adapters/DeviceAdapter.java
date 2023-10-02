@@ -1,5 +1,6 @@
 package ao.play.freekick.Adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,50 +10,47 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Locale;
 
+import ao.play.freekick.Classes.Animation;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Interfaces.ViewOnClickListener;
-import ao.play.freekick.Models.MonthAndDay;
+import ao.play.freekick.Models.Device;
 import ao.play.freekick.R;
 
-public class MonthsAndDaysAdapter extends RecyclerView.Adapter<MonthsAndDaysAdapter.ViewHolder> {
-
-    private final List<MonthAndDay> monthAndDays;
+public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
     private final ViewOnClickListener viewOnClickListener;
+    private final List<Device> devices;
+    private final String[] headers;
 
-    public MonthsAndDaysAdapter(List<MonthAndDay> monthAndDays, ViewOnClickListener viewOnClickListener) {
-        this.monthAndDays = monthAndDays;
+    public DeviceAdapter(Context context, List<Device> devices, ViewOnClickListener viewOnClickListener) {
+        this.headers = context.getResources().getStringArray(R.array.headers);
         this.viewOnClickListener = viewOnClickListener;
+        this.devices = devices;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.time_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.revenue_row, parent, false);
         return new ViewHolder(view, viewOnClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        MonthAndDay item = monthAndDays.get(position);
-        holder.number.setText(item.getNumber());
-        holder.name.setText(getMonthDisplayName(item));
+        Device item = devices.get(position);
+
+        String number = item.getNumber();
+        holder.name.setText(headers[Integer.parseInt(number) - 1]);
+        holder.number.setText(number);
         holder.time.setText(DateAndTime.durationToClockFormat(item.getDuration()));
         holder.price.setText(String.valueOf(item.getPrice()));
+
+        Animation.startAnimation(holder.itemView);
     }
 
     @Override
     public int getItemCount() {
-        return monthAndDays.size();
-    }
-
-    private String getMonthDisplayName(MonthAndDay item) {
-        if (Locale.getDefault().getLanguage().equals("en")) {
-            return item.getEnglish_name();
-        } else {
-            return item.getArabic_name();
-        }
+        return devices.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -66,7 +64,7 @@ public class MonthsAndDaysAdapter extends RecyclerView.Adapter<MonthsAndDaysAdap
             time = itemView.findViewById(R.id.time);
             price = itemView.findViewById(R.id.price);
 
-            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(number.getText().toString()));
+            itemView.setOnClickListener(v -> viewOnClickListener.onClickListener(number.getText().toString(), name.getText().toString()));
         }
     }
 }

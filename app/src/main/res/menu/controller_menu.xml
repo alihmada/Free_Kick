@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--    <item-->
-    <!--        android:id="@+id/add_controller"-->
-    <!--        android:icon="@drawable/plus_icon"-->
-    <!--        android:title="@string/add"-->
-    <!--        app:showAsAction="ifRoom" />-->
+<!--        <item-->
+<!--            android:id="@+id/report"-->
+<!--            android:icon="@drawable/report"-->
+<!--            android:title="@string/report"-->
+<!--            app:showAsAction="ifRoom" />-->
 
     <item
         android:id="@+id/scan"

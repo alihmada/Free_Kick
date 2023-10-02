@@ -22,7 +22,7 @@
     <color name="account_filed">#242424</color>
 
     <color name="remove">#929292</color>
-    <color name="bottom_sheet">#121212</color>
+    <color name="bottom_sheet">#1F222B</color>
 
     <color name="tab">#2A3C63</color>
 
@@ -53,9 +53,15 @@
     <style name="cardViewStyle" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">@dimen/card_corner_radius</item>
         <item name="cardElevation">@dimen/card_elevation</item>
-        <item name="android:layout_margin">@dimen/margin</item>
+        <item name="android:layout_marginHorizontal">@dimen/margin</item>
+        <item name="android:layout_marginBottom">@dimen/margin</item>
         <item name="android:padding">@dimen/padding</item>
-        <item name="android:shadowColor">@color/white</item>
+    </style>
+
+    <style name="card_view_row" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/corner_size</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="android:background">@drawable/blue_stroke_with_1dp_width</item>
     </style>
 
     <style name="textViewStyle">

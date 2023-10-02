@@ -1,15 +1,15 @@
 package ao.play.freekick.Models;
 
-public class CustomerDetails {
+public class Indebtedness {
     private String id;
     private String letter;
     private String value;
     private String time;
 
-    public CustomerDetails() {
+    public Indebtedness() {
     }
 
-    public CustomerDetails(String id, String letter, String value, String time) {
+    public Indebtedness(String id, String letter, String value, String time) {
         this.id = id;
         this.letter = letter;
         this.value = value;

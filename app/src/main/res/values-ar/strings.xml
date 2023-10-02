@@ -96,6 +96,7 @@
 
     <!-- Notifications -->
 
+    <string name="enable">تفعيل</string>
     <string name="ask_user_notification_permission">يجب تمكين الإشعارات</string>
     <string name="notification_content">قم بإيقاف تشغيل الجهاز</string>
     <string name="notification_title">انتهى وقته</string>
@@ -198,7 +199,7 @@
 
     <!-- Controllers -->
 
-    <string name="add">إضافة جهاز تحكم</string>
+    <string name="report">إنشاء تقرير</string>
     <string name="controller_no">وحدة التحكم رقم</string>
 
     <string name="good">جيد</string>

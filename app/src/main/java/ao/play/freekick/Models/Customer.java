@@ -1,5 +1,7 @@
 package ao.play.freekick.Models;
 
+import java.io.Serializable;
+
 public class Customer {
     private String id;
     private String name;

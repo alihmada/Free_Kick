@@ -18,8 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,35 +32,19 @@ import java.util.List;
 
 import ao.play.freekick.Adapters.ControllerAdapter;
 import ao.play.freekick.Classes.Capture;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.Loading;
 import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Interfaces.ViewOnClickListener;
-import ao.play.freekick.Models.Common;
 import ao.play.freekick.Models.Controller;
-import ao.play.freekick.Models.RevenueDeviceData;
 import ao.play.freekick.R;
 
 public class Controllers extends Fragment implements ViewOnClickListener {
 
-    public static Controller controller;
-    ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
-        if (result.getContents() != null) {
-            Loading.showProgressDialog();
-            String code = null;
-            try {
-                code = EncryptionAndDecryption.decrypt(result.getContents());
-            } catch (Exception ignored) {
-                Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
-            }
-
-            assert code != null;
-            if (code.matches("controller\\d+")) {
-                getController(code);
-            }
-        }
-    }); // End of registerForActivityResult()
+    private SwipeRefreshLayout swipeRefreshLayout;
+    ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher;
     private List<Controller> controllerList;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
@@ -89,11 +73,21 @@ public class Controllers extends Fragment implements ViewOnClickListener {
         progressBar = view.findViewById(R.id.progressBar);
 
         recyclerView = view.findViewById(R.id.controllers_recycler);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+        setupScanOptionsActivityResultLauncher();
+        setupSwipeRefreshLayout(view);
         setupView();
 
         return view;
+    }
+
+    private void setupSwipeRefreshLayout(View view) {
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            setupView();
+            swipeRefreshLayout.setRefreshing(false);
+        });
     }
 
     private void setupView() {
@@ -108,6 +102,25 @@ public class Controllers extends Fragment implements ViewOnClickListener {
             setupWifi(getString(R.string.no_internet));
         }
     }
+
+    private void setupScanOptionsActivityResultLauncher() {
+        scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
+            if (result.getContents() != null) {
+                Loading.showProgressDialog();
+                String code = null;
+                try {
+                    code = Ciphering.decrypt(result.getContents());
+                } catch (Exception ignored) {
+                    Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
+                }
+
+                assert code != null;
+                if (code.matches("controller\\d+")) {
+                    getController(code);
+                }
+            }
+        });
+    } // End of registerForActivityResult()
 
     private void setupWifi(String message) {
         alert.setVisibility(View.VISIBLE);
@@ -134,13 +147,17 @@ public class Controllers extends Fragment implements ViewOnClickListener {
                     Controller controller = controllerList.get(1);
                     controllerList.remove(1);
                     controllerList.add(controller);
-                    recyclerView.setAdapter(new ControllerAdapter(requireContext(), controllerList, Controllers.this));
-                    progressBar.setVisibility(View.GONE);
-                    alert.setVisibility(View.GONE);
+                    if (isAdded()) {
+                        recyclerView.setAdapter(new ControllerAdapter(requireContext(), controllerList, Controllers.this));
+                        progressBar.setVisibility(View.GONE);
+                        alert.setVisibility(View.GONE);
+                    }
                 } else {
-                    recyclerView.setAdapter(new ControllerAdapter(requireContext(), controllerList, Controllers.this));
-                    alert.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
+                    if (isAdded()) {
+                        recyclerView.setAdapter(new ControllerAdapter(requireContext(), controllerList, Controllers.this));
+                        alert.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
             }
 
@@ -151,39 +168,12 @@ public class Controllers extends Fragment implements ViewOnClickListener {
     }
 
     private void getController(String name) {
-        Firebase.getController(requireContext()).child(name).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    controller = snapshot.getValue(Controller.class);
 
-                    Intent intent = new Intent(requireContext(), ao.play.freekick.Activities.Controllers.class);
-                    intent.putExtra(Common.ID, controller.getId());
-                    startActivity(intent);
+        Intent intent = new Intent(requireContext(), ao.play.freekick.Activities.Controllers.class);
+        intent.putExtra(Common.NAME, name);
+        startActivity(intent);
 
-                    Loading.dismissProgressDialog();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        Firebase.getController(requireContext()).child(name).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    controller = snapshot.getValue(Controller.class);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        Loading.dismissProgressDialog();
     }
 
     @Override
@@ -194,32 +184,31 @@ public class Controllers extends Fragment implements ViewOnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        if (item.getItemId() == R.id.add_controller) {
+//        if (item.getItemId() == R.id.report) {
 //
 //            return true;
 //        } else
         if (item.getItemId() == R.id.scan) {
-            ScanOptions scanOptions = new ScanOptions();
-            scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
-            scanOptionsActivityResultLauncher.launch(scanOptions);
+            try {
+                setupScanner();
+            } catch (IllegalStateException e) {
+                setupScanOptionsActivityResultLauncher();
+                setupScanner();
+            }
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
+    private void setupScanner() {
+        ScanOptions scanOptions = new ScanOptions();
+        scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
+        scanOptionsActivityResultLauncher.launch(scanOptions);
+    }
+
     @Override
-    public void onClickListener(String name) {
+    public void onClickListener(String name, String empty) {
         getController(name);
-    }
-
-    @Override
-    public void openProfile(String id) {
-
-    }
-
-    @Override
-    public void languageHandler(RevenueDeviceData revenueDeviceData) {
-
     }
 }

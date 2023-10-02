@@ -112,6 +112,7 @@
 
     <!-- notifications -->
 
+    <string name="enable">Enable</string>
     <string name="ask_user_notification_permission">Notifications must be enabled</string>
     <string name="notification_content">The device must be evacuated</string>
     <string name="notification_title">is finished</string>
@@ -222,7 +223,7 @@
 
     <!-- Controllers -->
 
-    <string name="add">Add controller</string>
+    <string name="report">Make a report</string>
     <string name="controller_no">Controller no.</string>
 
     <string name="good">Good</string>

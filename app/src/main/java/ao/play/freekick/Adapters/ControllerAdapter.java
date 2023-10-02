@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import ao.play.freekick.Fragments.Controllers;
+import ao.play.freekick.Classes.Animation;
 import ao.play.freekick.Interfaces.ViewOnClickListener;
 import ao.play.freekick.Models.Controller;
 import ao.play.freekick.R;
@@ -40,6 +40,8 @@ public class ControllerAdapter extends RecyclerView.Adapter<ControllerAdapter.Vi
         String id = controllerList.get(position).getId();
         holder.id.setText(id);
         holder.name.setText(String.format("%s %s", context.getString(R.string.controller_no), id));
+
+        Animation.startAnimation(holder.itemView);
     }
 
     @Override
@@ -56,9 +58,7 @@ public class ControllerAdapter extends RecyclerView.Adapter<ControllerAdapter.Vi
             id = itemView.findViewById(R.id.letter);
             name = itemView.findViewById(R.id.debt_name);
 
-            itemView.setOnClickListener(view -> {
-                viewOnClickListener.onClickListener(controllerList.get(getAdapterPosition()).getName());
-            });
+            itemView.setOnClickListener(view -> viewOnClickListener.onClickListener(controllerList.get(getAdapterPosition()).getName(), null));
         }
     }
 }

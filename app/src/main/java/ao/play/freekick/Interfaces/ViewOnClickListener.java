@@ -1,12 +1,15 @@
 package ao.play.freekick.Interfaces;
 
-import ao.play.freekick.Models.RevenueDeviceData;
+import ao.play.freekick.Models.Temporal;
 
-public interface
-ViewOnClickListener {
-    void onClickListener(String id);
+public interface ViewOnClickListener {
+    void onClickListener(String id, String name);
 
-    void openProfile(String id);
+    default void languageHandler(Temporal temporal){
 
-    void languageHandler(RevenueDeviceData revenueDeviceData);
+    }
+
+    default void openProfile(String id){
+
+    }
 }

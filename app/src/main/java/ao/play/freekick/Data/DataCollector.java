@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import com.google.gson.Gson;
 
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.Common;
 
 public class DataCollector {
     private static String data;
@@ -29,7 +29,7 @@ public class DataCollector {
     private static SharedPreferences getDecryptedSharedPreferences(Context context) {
         SharedPreferences sharedPreferences = null;
         try {
-            sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+            sharedPreferences = context.getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
         } catch (Exception ignored) {
         }
         return sharedPreferences;

@@ -1,4 +1,4 @@
-package ao.play.freekick.Models;
+package ao.play.freekick.Classes;
 
 public class Common {
 
@@ -7,7 +7,6 @@ public class Common {
 
     // String constants
     public static final String ARABIC_NAME = "arabic_name";
-    public static final String CODE = "code";
     public static final String CONTROLLERS = "Controllers";
     public static final String DATABASE_NAME = "Database";
     public static final String USER_DATA = "user_data";
@@ -38,7 +37,6 @@ public class Common {
     public static final String ITEM_POSITION = "thread_position";
     public static final String TITLE = "title";
     public static final String IMAGE = "image";
-    public static final String USER_PASSWORD = "user_password";
     public static final String YEAR = "year";
     public static final String YEAR_VALUE = "yearValue";
     public static final String REMEMBER_ME = "remember me";
@@ -47,9 +45,8 @@ public class Common {
     public static final int HOUR = 60;
     public static final int HOUR_PRICE = 10;
     public static final int TIME_INTERVAL = 500;
-    public static final String CUSTOMER_MANE = "customer name";
-    public static final String CUSTOMER_FOR_YOU = "customer for you";
-    public static final String CUSTOMER_FOR_ME = "customer_for_me";
+    public static final String CUSTOMER = "customer";
+    public static final String CUSTOMER_ID = "customer id";
     public static final String ID = "controller id";
     private static String ROOT;
 

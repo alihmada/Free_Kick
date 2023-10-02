@@ -37,12 +37,13 @@ import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import ao.play.freekick.Activities.Login;
-import ao.play.freekick.Activities.Main;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.QRConstructor;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.BottomSheetDialog;
 import ao.play.freekick.Dialogs.ConfirmationDialog;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Dialogs.Qr;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Models.User;
 import ao.play.freekick.R;
 
@@ -70,7 +71,7 @@ public class Account extends Fragment {
 
     private void init(View view) {
         try {
-            sharedPreferences = requireContext().getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+            sharedPreferences = requireContext().getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
         } catch (Exception ignored) {
         }
         firstName = view.findViewById(R.id.account_user_first);
@@ -140,7 +141,11 @@ public class Account extends Fragment {
         StorageReference storageRef = storage.getReference().child("images");
 
         StorageReference imageRef = storageRef.child(Firebase.getPhoneNumber());
-        imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri.toString()).into(userImage)).addOnFailureListener(exception -> userImage.setImageDrawable(ResourcesCompat.getDrawable(requireContext().getResources(), R.drawable.profile, requireContext().getTheme())));
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri.toString()).into(userImage)).addOnFailureListener(exception -> {
+        });
+
+        if (isAdded())
+            userImage.setImageDrawable(ResourcesCompat.getDrawable(requireContext().getResources(), R.drawable.profile, requireContext().getTheme()));
     }
 
     private void uploadImage() {
@@ -208,10 +213,11 @@ public class Account extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.shop_id) {
-            Main.createQR(requireContext(), Common.getROOT());
+            Qr qr = new Qr(QRConstructor.createQR(Common.getROOT()));
+            qr.show(getParentFragmentManager(), "");
             return true;
         } else if (item.getItemId() == R.id.logout) {
-            ConfirmationDialog.show(requireContext(), getString(R.string.are_you_sure_logout), new ConfirmationDialog.ConfirmationDialogListener() {
+            ConfirmationDialog dialog = new ConfirmationDialog(getString(R.string.are_you_sure_logout), new ConfirmationDialog.ConfirmationDialogListener() {
                 @Override
                 public void onConfirm() {
                     sharedPreferences.edit().remove(Common.USER_DATA).remove(Common.SHOP_ID).apply();
@@ -223,6 +229,7 @@ public class Account extends Fragment {
 
                 }
             });
+            dialog.show(getParentFragmentManager(), "");
             return true;
         } else {
             return super.onOptionsItemSelected(item);

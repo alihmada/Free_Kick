@@ -1,12 +1,9 @@
 package ao.play.freekick.Activities;
 
-import static ao.play.freekick.Models.Common.TIME_INTERVAL;
+import static ao.play.freekick.Classes.Common.TIME_INTERVAL;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -16,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -28,73 +26,49 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
 
-import ao.play.freekick.Adapters.HomeAdapter;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
-import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Dialogs.Loading;
+import ao.play.freekick.Dialogs.NotificationAlert;
 import ao.play.freekick.Dialogs.Password;
-import ao.play.freekick.Dialogs.Qr;
 import ao.play.freekick.Fragments.Account;
 import ao.play.freekick.Fragments.Controllers;
 import ao.play.freekick.Fragments.Debts;
 import ao.play.freekick.Fragments.Home;
 import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Interfaces.ViewListener;
-import ao.play.freekick.Models.Common;
 import ao.play.freekick.Models.User;
 import ao.play.freekick.R;
 
 public class Main extends AppCompatActivity implements ViewListener {
-    public static SharedPreferences sharedPreferences;
+    private static final int NOTIFICATION_SETTINGS_REQUEST_CODE = 1;
+    private SharedPreferences sharedPreferences;
     private BottomNavigationView navigationView;
-    private Home home;
     private Controllers controllers;
-    private Debts debts;
-    private Account account;
-    private Gson gson;
     private Vibrator vibrator;
     private long backPressed;
-
-    public static void createQR(Context context, String text) {
-        BitMatrix bitMatrix = null;
-        try {
-            bitMatrix = new QRCodeWriter().encode(EncryptionAndDecryption.encrypt(text), BarcodeFormat.QR_CODE, 780, 780);
-        } catch (Exception ignored) {
-        }
-        if (bitMatrix != null) {
-            int width = bitMatrix.getWidth();
-            int height = bitMatrix.getHeight();
-            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
-            }
-
-            Qr.showQrDialog(context, bitmap);
-        }
-    }
+    private Account account;
+    private Bundle bundle;
+    private Debts debts;
+    private Gson gson;
+    private Home home;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setCustomActionBar();
         checkNotificationPermission();
+        setCustomActionBar();
         itemsDeclaration();
 
         if (savedInstanceState == null) {
@@ -123,17 +97,6 @@ public class Main extends AppCompatActivity implements ViewListener {
         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
     }
 
-    @Override
-    public void onBackPressed() {
-        vibration(0);
-        if (backPressed + TIME_INTERVAL > System.currentTimeMillis()) {
-            super.onBackPressed();
-        } else {
-            Toast.makeText(this, getString(R.string.tap_again), Toast.LENGTH_SHORT).show();
-        }
-        backPressed = System.currentTimeMillis();
-    }
-
     private void setCustomActionBar() {
         Objects.requireNonNull(getSupportActionBar()).setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.tool_bar);
@@ -142,9 +105,10 @@ public class Main extends AppCompatActivity implements ViewListener {
     private void itemsDeclaration() {
         navigationView = findViewById(R.id.navigation);
         home = new Home();
-        controllers = new Controllers();
         debts = new Debts();
+        bundle = new Bundle();
         account = new Account();
+        controllers = new Controllers();
         Loading.progressDialogConstructor(this);
 
         findViewById(R.id.tool_bar_title).setOnLongClickListener(v -> {
@@ -161,7 +125,7 @@ public class Main extends AppCompatActivity implements ViewListener {
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         try {
-            sharedPreferences = getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
         } catch (Exception ignored) {
         }
 
@@ -180,7 +144,7 @@ public class Main extends AppCompatActivity implements ViewListener {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     try {
-                        if (EncryptionAndDecryption.encrypt(passcode).equals(Objects.requireNonNull(snapshot.getValue(String.class)))) {
+                        if (Ciphering.encrypt(passcode).equals(Objects.requireNonNull(snapshot.getValue(String.class)))) {
                             startRevenue();
                             sharedPreferences.edit().putBoolean(Common.REMEMBER_ME, isRememberMe).apply();
                         } else {
@@ -203,41 +167,63 @@ public class Main extends AppCompatActivity implements ViewListener {
 
     private void startRevenue() {
         Intent revenue = new Intent(Main.this, Revenue.class);
-        revenue.putExtra(Common.TITLE, getString(R.string.years));
-        revenue.putExtra(Common.YEAR, true);
+        bundle.putString(Common.TITLE, getString(R.string.years));
+        bundle.putBoolean(Common.YEAR, true);
+        revenue.putExtras(bundle);
         startActivity(revenue);
     }
 
     private void checkNotificationPermission() {
         if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
-            ConfirmationDialog.show(this, getString(R.string.ask_user_notification_permission), new ConfirmationDialog.ConfirmationDialogListener() {
-                @Override
-                public void onConfirm() {
-                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onCancel() {
-                    finish();
-                }
+            NotificationAlert dialog = new NotificationAlert(() -> {
+                Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+                startActivityForResult(intent, NOTIFICATION_SETTINGS_REQUEST_CODE);
             });
+            dialog.show(getSupportFragmentManager(), "");
+            dialog.setCancelable(false);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == NOTIFICATION_SETTINGS_REQUEST_CODE) {
+            if (NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                Intent intent = new Intent(getApplicationContext(), Main.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        vibration(0);
+        if (backPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed();
+        } else {
+            Toast.makeText(this, getString(R.string.tap_again), Toast.LENGTH_SHORT).show();
+        }
+        backPressed = System.currentTimeMillis();
     }
 
     @Override
     public void languageHandler(Device device, int position) {
         if (device != null) {
+            String[] headers = getResources().getStringArray(R.array.headers);
+
             String startingTime = device.getStartingTime();
             String endingTime = device.getEndingTime();
 
             if ((startingTime.contains("م") || startingTime.contains("ص")) && Locale.getDefault().getLanguage().equals("en")) {
-                device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
+                device.setHeader(headers[position]);
                 device.setStartingTime(startingTime.replace("م", "PM").replace("ص", "AM"));
                 device.setEndingTime(endingTime.replace("م", "PM").replace("ص", "AM"));
             } else if ((startingTime.contains("PM") || startingTime.contains("AM")) && Locale.getDefault().getLanguage().equals("ar")) {
-                device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
+                device.setHeader(headers[position]);
                 device.setStartingTime(startingTime.replace("PM", "م").replace("AM", "ص"));
                 device.setEndingTime(endingTime.replace("PM", "م").replace("AM", "ص"));
             }

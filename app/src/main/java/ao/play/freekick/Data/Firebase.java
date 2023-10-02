@@ -20,11 +20,11 @@ import java.util.Objects;
 
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
 import ao.play.freekick.Dialogs.Loading;
 import ao.play.freekick.Intenet.Internet;
-import ao.play.freekick.Models.Common;
-import ao.play.freekick.Models.RevenueDeviceData;
+import ao.play.freekick.Classes.Common;
+import ao.play.freekick.Models.Temporal;
 import ao.play.freekick.R;
 
 public class Firebase {
@@ -101,7 +101,7 @@ public class Firebase {
 
     public static void rootHaveValue(Context context) {
         try {
-            sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+            sharedPreferences = context.getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
         } catch (Exception ignored) {
         }
 
@@ -136,11 +136,11 @@ public class Firebase {
 
     } // End upload()
 
-    public static void save(String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
+    public static void save(String deviceNumber, Temporal temporal, Context context) {
 
         Internet.isConnected(context);
 
-        if (DateAndTime.isSpanningMultipleDays(revenueDeviceData.getStart(), revenueDeviceData.getEnd())) {
+        if (DateAndTime.isSpanningMultipleDays(temporal.getStart(), temporal.getEnd())) {
 
             String[] date = DateAndTime.getYesterday();
 
@@ -152,15 +152,15 @@ public class Firebase {
 
             DatabaseReference device = getDevice(day, deviceNumber);
 
-            Query query = device.orderByChild("start").equalTo(revenueDeviceData.getStart());
+            Query query = device.orderByChild("start").equalTo(temporal.getStart());
 
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        RevenueDeviceData deviceData;
+                        Temporal deviceData;
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            deviceData = dataSnapshot.getValue(RevenueDeviceData.class);
+                            deviceData = dataSnapshot.getValue(Temporal.class);
                             dataSnapshot.getRef().removeValue();
 
                             assert deviceData != null;
@@ -208,68 +208,68 @@ public class Firebase {
 
         DatabaseReference device = getDevice(day, deviceNumber);
 
-        queryGetStarting(year, month, day, device, deviceNumber, revenueDeviceData, context);
+        queryGetStarting(year, month, day, device, deviceNumber, temporal, context);
 //        } else {
 //            try (Database database = new Database(context)) {
-//                database.pushItem(DateAndTime.getYear(), DateAndTime.getMonth(), DateAndTime.getDay(), deviceNumber, gson.toJson(revenueDeviceData));
+//                database.pushItem(DateAndTime.getYear(), DateAndTime.getMonth(), DateAndTime.getDay(), deviceNumber, gson.toJson(temporal));
 //            } catch (Exception ignored) {
 //            }
         //}
     } //End save()
 
-    private static void queryGetStarting(DatabaseReference year, DatabaseReference month, DatabaseReference day, DatabaseReference device, String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
+    private static void queryGetStarting(DatabaseReference year, DatabaseReference month, DatabaseReference day, DatabaseReference device, String deviceNumber, Temporal temporal, Context context) {
 
-        Query query = device.orderByChild("start").equalTo(revenueDeviceData.getStart());
+        Query query = device.orderByChild("start").equalTo(temporal.getStart());
 
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    RevenueDeviceData deviceData;
+                    Temporal deviceData;
 
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        deviceData = dataSnapshot.getValue(RevenueDeviceData.class);
+                        deviceData = dataSnapshot.getValue(Temporal.class);
 
                         dataSnapshot.getRef().removeValue();
 
                         assert deviceData != null;
-                        updatePriceInDelete(device.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
-                        updateDurationInDelete(device.child(Common.DURATION), deviceData, revenueDeviceData);
+                        updatePriceInDelete(device.child(Common.PRICE), temporal, deviceData.getPrice());
+                        updateDurationInDelete(device.child(Common.DURATION), deviceData, temporal);
 
                         // Update day values
-                        updatePriceInDelete(day.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
-                        updateDurationInDelete(day.child(Common.DURATION), deviceData, revenueDeviceData);
+                        updatePriceInDelete(day.child(Common.PRICE), temporal, deviceData.getPrice());
+                        updateDurationInDelete(day.child(Common.DURATION), deviceData, temporal);
 
                         // Update month values
-                        updatePriceInDelete(month.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
-                        updateDurationInDelete(month.child(Common.DURATION), deviceData, revenueDeviceData);
+                        updatePriceInDelete(month.child(Common.PRICE), temporal, deviceData.getPrice());
+                        updateDurationInDelete(month.child(Common.DURATION), deviceData, temporal);
 
                         // Update year values
-                        updatePriceInDelete(year.child(Common.PRICE), revenueDeviceData, deviceData.getPrice());
-                        updateDurationInDelete(year.child(Common.DURATION), deviceData, revenueDeviceData);
+                        updatePriceInDelete(year.child(Common.PRICE), temporal, deviceData.getPrice());
+                        updateDurationInDelete(year.child(Common.DURATION), deviceData, temporal);
                     }
                 } else {
 
                     // Update device values
                     device.child(Common.NUMBER).setValue(deviceNumber);
-                    updatePrice(device.child(Common.PRICE), revenueDeviceData.getPrice());
-                    updateDuration(device.child(Common.DURATION), revenueDeviceData);
+                    updatePrice(device.child(Common.PRICE), temporal.getPrice());
+                    updateDuration(device.child(Common.DURATION), temporal);
 
                     // Update day values
-                    updatePrice(day.child(Common.PRICE), revenueDeviceData.getPrice());
-                    updateDuration(day.child(Common.DURATION), revenueDeviceData);
+                    updatePrice(day.child(Common.PRICE), temporal.getPrice());
+                    updateDuration(day.child(Common.DURATION), temporal);
 
                     // Update month values
-                    updatePrice(month.child(Common.PRICE), revenueDeviceData.getPrice());
-                    updateDuration(month.child(Common.DURATION), revenueDeviceData);
+                    updatePrice(month.child(Common.PRICE), temporal.getPrice());
+                    updateDuration(month.child(Common.DURATION), temporal);
 
                     // Update year values
-                    updatePrice(year.child(Common.PRICE), revenueDeviceData.getPrice());
-                    updateDuration(year.child(Common.DURATION), revenueDeviceData);
+                    updatePrice(year.child(Common.PRICE), temporal.getPrice());
+                    updateDuration(year.child(Common.DURATION), temporal);
                 }
 
-                // Push revenueDeviceData
-                device.push().setValue(revenueDeviceData).addOnSuccessListener(unused -> Toast.makeText(context, context.getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(context, context.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show());
+                // Push temporal
+                device.push().setValue(temporal).addOnSuccessListener(unused -> Toast.makeText(context, context.getResources().getString(R.string.saved), Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(context, context.getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show());
             } // End query onDataChange()
 
             @Override
@@ -298,12 +298,12 @@ public class Firebase {
         });
     } // End updatePrice()
 
-    private static void updatePriceInDelete(DatabaseReference ref, RevenueDeviceData revenueDeviceData, String price) {
+    private static void updatePriceInDelete(DatabaseReference ref, Temporal temporal, String price) {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double updatedValue = Double.parseDouble(String.valueOf(snapshot.getValue())) - Double.parseDouble(price);
-                ref.setValue(updatedValue).addOnSuccessListener(unused -> updatePrice(ref, revenueDeviceData.getPrice()));
+                ref.setValue(updatedValue).addOnSuccessListener(unused -> updatePrice(ref, temporal.getPrice()));
             }
 
             @Override
@@ -313,7 +313,7 @@ public class Firebase {
         });
     } // End updatePriceInDelete()
 
-    private static void updateDuration(DatabaseReference ref, RevenueDeviceData revenueDeviceData) {
+    private static void updateDuration(DatabaseReference ref, Temporal temporal) {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -321,7 +321,7 @@ public class Firebase {
                 if (snapshot.exists()) {
                     currentValue = String.valueOf(snapshot.getValue());
                 }
-                String updatedValue = DateAndTime.durationPlus(currentValue, DateAndTime.timeDifference(languageHandler(revenueDeviceData.getStart()), languageHandler(revenueDeviceData.getEnd())).toString());
+                String updatedValue = DateAndTime.durationPlus(currentValue, DateAndTime.timeDifference(languageHandler(temporal.getStart()), languageHandler(temporal.getEnd())).toString());
                 ref.setValue(updatedValue);
             }
 
@@ -332,12 +332,12 @@ public class Firebase {
         });
     } // End updateDuration()
 
-    private static void updateDurationInDelete(DatabaseReference ref, RevenueDeviceData previousRevenueDeviceData, RevenueDeviceData currentRevenueDeviceData) {
+    private static void updateDurationInDelete(DatabaseReference ref, Temporal previousTemporal, Temporal currentTemporal) {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.timeDifference(languageHandler(previousRevenueDeviceData.getStart()), languageHandler(previousRevenueDeviceData.getEnd())).toString());
-                ref.setValue(updatedValue).addOnSuccessListener(unused -> updateDuration(ref, currentRevenueDeviceData));
+                String updatedValue = DateAndTime.durationMinus(String.valueOf(snapshot.getValue()), DateAndTime.timeDifference(languageHandler(previousTemporal.getStart()), languageHandler(previousTemporal.getEnd())).toString());
+                ref.setValue(updatedValue).addOnSuccessListener(unused -> updateDuration(ref, currentTemporal));
             }
 
             @Override

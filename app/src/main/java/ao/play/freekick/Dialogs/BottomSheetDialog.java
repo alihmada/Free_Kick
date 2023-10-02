@@ -47,7 +47,11 @@ public class BottomSheetDialog extends DialogFragment {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.account_bottom_sheet);
 
-        initialize(dialog);
+        try {
+            initialize(dialog);
+        } catch (Exception ignored){
+            dismiss();
+        }
 
         Window window = dialog.getWindow();
         if (window != null) {

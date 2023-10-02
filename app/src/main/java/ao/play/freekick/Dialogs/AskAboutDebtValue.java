@@ -1,10 +1,12 @@
 package ao.play.freekick.Dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,8 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
-
-import java.util.Objects;
 
 import ao.play.freekick.R;
 
@@ -38,49 +38,49 @@ public class AskAboutDebtValue extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = new Dialog(requireContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.debt_details_dialog);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        main(dialog);
 
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View view = inflater.inflate(R.layout.debt_details_dialog, null);
-
-        main(view);
-
-        builder.setView(view);
-
-        AlertDialog dialog = builder.create();
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
-
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.setGravity(Gravity.CENTER);
+            window.setWindowAnimations(R.style.dialog_animation);
+        }
         return dialog;
     }
 
-    private void main(View view) {
-        initializeViews(view);
-        setupForHimOption(view);
-        setupForYouOption(view);
-        setupSaveButton(view);
+    private void main(Dialog dialog) {
+        initializeViews(dialog);
+        setupForHimOption(dialog);
+        setupForYouOption(dialog);
+        setupSaveButton(dialog);
     }
 
-    private void initializeViews(View view) {
-        debtValue = view.findViewById(R.id.value_of_debt);
+    private void initializeViews(Dialog dialog) {
+        debtValue = dialog.findViewById(R.id.value_of_debt);
     }
 
-    private void setupForYouOption(View view) {
-        forYouParent = view.findViewById(R.id.for_you_parent);
-        forYou = view.findViewById(R.id.for_you_checkbox);
+    private void setupForYouOption(Dialog dialog) {
+        forYouParent = dialog.findViewById(R.id.for_you_parent);
+        forYou = dialog.findViewById(R.id.for_you_checkbox);
 
         forYouParent.setOnClickListener(v -> setOptionSelected(forYouParent, forYou, forHimParent, forHim));
     }
 
-    private void setupForHimOption(View view) {
-        forHimParent = view.findViewById(R.id.for_him_parent);
-        forHim = view.findViewById(R.id.for_him_checkbox);
+    private void setupForHimOption(Dialog dialog) {
+        forHimParent = dialog.findViewById(R.id.for_him_parent);
+        forHim = dialog.findViewById(R.id.for_him_checkbox);
 
         forHimParent.setOnClickListener(v -> setOptionSelected(forHimParent, forHim, forYouParent, forYou));
     }
 
-    private void setupSaveButton(View view) {
-        Button save = view.findViewById(R.id.save);
+    private void setupSaveButton(Dialog dialog) {
+        Button save = dialog.findViewById(R.id.save);
 
         save.setOnClickListener(view1 -> {
             String debtValue = String.valueOf(this.debtValue.getText());
@@ -96,7 +96,7 @@ public class AskAboutDebtValue extends DialogFragment {
 
     private void setOptionSelected(ConstraintLayout selectedLayout, CheckBox selectedCheckBox, ConstraintLayout deselectedLayout, CheckBox deselectedCheckBox) {
         selectedCheckBox.setChecked(true);
-        selectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.green_stroke));
+        selectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.blue_stroke_with_2dp_width));
 
         deselectedCheckBox.setChecked(false);
         deselectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.gray_stroke));

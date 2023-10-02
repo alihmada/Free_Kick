@@ -16,9 +16,9 @@ import com.google.gson.Gson;
 
 import java.util.Objects;
 
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
 import ao.play.freekick.Data.Firebase;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Models.User;
 import ao.play.freekick.R;
 
@@ -32,7 +32,7 @@ public class Splash extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         try {
-            sharedPreferences = getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
         } catch (Exception ignored) {
         }
 

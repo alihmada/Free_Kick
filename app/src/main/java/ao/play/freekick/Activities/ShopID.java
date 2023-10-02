@@ -36,10 +36,10 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.Objects;
 
 import ao.play.freekick.Classes.Capture;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.Loading;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Models.User;
 import ao.play.freekick.R;
 
@@ -67,7 +67,7 @@ public class ShopID extends AppCompatActivity {
         Loading.progressDialogConstructor(this);
 
         try {
-            sharedPreferences = getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+            sharedPreferences = getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
         } catch (Exception ignored) {
         }
 
@@ -93,7 +93,7 @@ public class ShopID extends AppCompatActivity {
             id = String.valueOf(shopId.getText());
 
             try {
-                id = EncryptionAndDecryption.decrypt(id);
+                id = Ciphering.decrypt(id);
             } catch (Exception e) {
                 showToast(getString(R.string.error_in_inputs));
                 return;

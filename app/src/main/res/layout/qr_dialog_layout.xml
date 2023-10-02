@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/qr_image_view"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Material3.CardView.Outlined"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:contentDescription="@string/app_name" />
+    android:padding="@dimen/padding"
+    app:cardCornerRadius="@dimen/corner_size"
+    app:cardElevation="@dimen/card_elevation"
+    app:strokeColor="?colorPrimary"
+    app:strokeWidth="2dp">
+
+    <ImageView
+        android:id="@+id/qr_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/app_name" />
+
+</com.google.android.material.card.MaterialCardView>

@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import ao.play.freekick.Classes.Notifications;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.R;
 
 public class VibrationNotificationService extends Service {

@@ -16,12 +16,13 @@ import com.hbb20.CountryCodePicker;
 
 import java.util.Objects;
 
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.R;
 
 public class Login extends AppCompatActivity {
     CountryCodePicker countryCodePicker;
     ConstraintLayout inputText;
+    Bundle bundle;
     boolean isError;
 
     @Override
@@ -30,6 +31,8 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         Objects.requireNonNull(getSupportActionBar()).hide();
+
+        bundle = new Bundle();
 
         inputText = findViewById(R.id.constraintLayout2);
 
@@ -60,7 +63,8 @@ public class Login extends AppCompatActivity {
             if (countryCodePicker.getSelectedCountryNameCode().equals("EG")) {
                 if (phoneNo.matches("^01[0125][0-9]{8}$")) {
                     Intent intent = new Intent(this, CodeVerification.class);
-                    intent.putExtra(Common.PHONE_NUMBER, normalizePhoneNumber(phoneNo));
+                    bundle.putString(Common.PHONE_NUMBER, normalizePhoneNumber(phoneNo));
+                    intent.putExtras(bundle);
                     startActivity(intent);
                 } else {
                     isError = true;

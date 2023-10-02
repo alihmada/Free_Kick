@@ -2,8 +2,6 @@ package ao.play.freekick.Classes;
 
 import java.time.Duration;
 
-import ao.play.freekick.Models.Common;
-
 public class Calculations {
 
     public static int sum(int firstNumber, int secondNumber) {

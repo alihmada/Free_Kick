@@ -1,9 +1,9 @@
 package ao.play.freekick.Models;
 
-public class RevenueDeviceData {
+public class Temporal {
     String start, end, state, time, price;
 
-    public RevenueDeviceData(String start, String end, String state, String time, String price) {
+    public Temporal(String start, String end, String state, String time, String price) {
         this.start = start;
         this.end = end;
         this.state = state;
@@ -11,7 +11,7 @@ public class RevenueDeviceData {
         this.price = price;
     }
 
-    public RevenueDeviceData() {
+    public Temporal() {
 
     }
 

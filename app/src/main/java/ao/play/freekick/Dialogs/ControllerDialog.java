@@ -23,25 +23,26 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Data.Firebase;
-import ao.play.freekick.Fragments.Controllers;
-import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
 
 public class ControllerDialog extends DialogFragment {
-    ConstraintLayout good, bad;
-    CheckBox goodCheckbox, badCheckbox;
+    private ConstraintLayout good, bad;
+    private CheckBox goodCheckbox, badCheckbox;
     private ControllerListener listener;
     private EditText problem;
     private Vibrator vibrator;
     private String headerText;
     private boolean isChecked;
+    private String name;
 
     public ControllerDialog() {
     }
 
-    public ControllerDialog(String headerText, ControllerListener listener) {
+    public ControllerDialog(String name, String headerText, ControllerListener listener) {
+        this.name = name;
         this.headerText = headerText;
         this.listener = listener;
     }
@@ -54,7 +55,11 @@ public class ControllerDialog extends DialogFragment {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.controller_dialog);
 
-        initialize(dialog);
+        try {
+            initialize(dialog);
+        } catch (Exception e) {
+            dismiss();
+        }
 
         Window window = dialog.getWindow();
         if (window != null) {
@@ -124,7 +129,7 @@ public class ControllerDialog extends DialogFragment {
                         return;
                     }
                 }
-                Firebase.getController(requireContext()).child(Controllers.controller.getName()).child("timeOfLastRepair").setValue(DateAndTime.getCurrentTime());
+                Firebase.getController(requireContext()).child(name).child("timeOfLastRepair").setValue(DateAndTime.getCurrentTime());
                 dialog.dismiss();
             } else {
                 handleInputErrors();
@@ -135,7 +140,7 @@ public class ControllerDialog extends DialogFragment {
 
     private void setOptionSelected(ConstraintLayout selectedLayout, CheckBox selectedCheckBox, ConstraintLayout deselectedLayout, CheckBox deselectedCheckBox) {
         selectedCheckBox.setChecked(true);
-        selectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.green_stroke));
+        selectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.blue_stroke_with_2dp_width));
 
         deselectedCheckBox.setChecked(false);
         deselectedLayout.setBackground(AppCompatResources.getDrawable(requireContext(), R.drawable.gray_stroke));

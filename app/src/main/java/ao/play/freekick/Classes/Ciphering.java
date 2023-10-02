@@ -13,7 +13,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-public class EncryptionAndDecryption {
+public class Ciphering {
     private static final String algorithm = "Blowfish";
     private static final String mode = "Blowfish/CBC/PKCS5Padding";
     private static final String iv = "abcdefgh";

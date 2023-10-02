@@ -26,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -37,27 +38,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import ao.play.freekick.Classes.Animation;
 import ao.play.freekick.Classes.Calculations;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Interfaces.ViewListener;
-import ao.play.freekick.Models.Common;
-import ao.play.freekick.Models.RevenueDeviceData;
+import ao.play.freekick.Models.Temporal;
 import ao.play.freekick.R;
 import ao.play.freekick.Receivers.AlarmReceiver;
 
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     public static HashMap<Integer, Handler> integerHandlerHashMap = new HashMap<>();
     public static HashMap<Integer, Runnable> integerRunnableHashMap = new HashMap<>();
-    List<Device> devices;
-    Context context;
     ViewListener viewListener;
+    FragmentManager manager;
+    List<Device> devices;
+    String[] headers;
+    Context context;
 
-    public HomeAdapter(Context context, List<Device> devices, ViewListener viewListener) {
+    public HomeAdapter(Context context, FragmentManager manager, List<Device> devices, ViewListener viewListener) {
         this.context = context;
+        this.manager = manager;
         this.devices = devices;
         this.viewListener = viewListener;
     }
@@ -77,9 +82,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             if (devices.get(position).getHeader() != null) {
                 holder.header.setText(devices.get(position).getHeader());
-            } else {
-                holder.header.setText(ViewHolder.HEADERS[position]);
-            }
+            } else holder.header.setText(headers[position]);
             holder.starting.setText(devices.get(position).getStartingTime());
             holder.spinner.setVisibility(devices.get(position).getSpinnerVisibility() == 0 ? View.VISIBLE : View.GONE);
             holder.spinner.setSelection(devices.get(position).getSpinnerIndex());
@@ -92,8 +95,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             holder.payment.setChecked(devices.get(position).isPayment());
             if (devices.get(position).isRunning()) holder.calculate.performClick();
         } else {
-            holder.header.setText(ViewHolder.HEADERS[position]);
+            holder.header.setText(headers[position]);
         }
+
+        Animation.startAnimation(holder.itemView);
     }
 
     @Override
@@ -101,12 +106,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return devices.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         public static final int EFFECT_CLICK = 0;
         public static final int EFFECT_DOUBLE_CLICK = 1;
         public static final int EFFECT_HEAVY_CLICK = 5;
 
-        public static String[] HEADERS;
         SharedPreferences sharedPreferences;
         Context context;
         ViewListener viewListener;
@@ -153,9 +157,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             } else if (v.getId() == R.id.ending_time) {
                 clickCounterForEnding = openTimePicker(ending, clickCounterForEnding);
             } else if (v.getId() == R.id.delete) {
-                delete(HEADERS[getAdapterPosition()]);
+                delete(HomeAdapter.this.headers[getAdapterPosition()]);
             } else if (v.getId() == R.id.add) {
-                ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_add), new ConfirmationDialog.ConfirmationDialogListener() {
+                ConfirmationDialog dialog = new ConfirmationDialog(context.getString(R.string.are_you_sure_add), new ConfirmationDialog.ConfirmationDialogListener() {
                     @Override
                     public void onConfirm() {
                         add();
@@ -166,10 +170,12 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                     }
                 });
+
+                dialog.show(manager, "");
             } else if (v.getId() == R.id.history) {
                 history();
             } else if (v.getId() == R.id.save) {
-                ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_save), new ConfirmationDialog.ConfirmationDialogListener() {
+                ConfirmationDialog dialog = new ConfirmationDialog(context.getString(R.string.are_you_sure_save), new ConfirmationDialog.ConfirmationDialogListener() {
                     @Override
                     public void onConfirm() {
                         save();
@@ -180,6 +186,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
                     }
                 });
+                dialog.show(manager, "");
             } else if (v.getId() == R.id.time) {
                 if (isRunning && !isOpenTime) {
                     viewListener.vibration(EFFECT_CLICK);
@@ -211,11 +218,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
             try {
-                sharedPreferences = context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+                sharedPreferences = context.getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
             } catch (Exception ignored) {
             }
 
-            HEADERS = context.getResources().getStringArray(R.array.headers);
+            HomeAdapter.this.headers = context.getResources().getStringArray(R.array.headers);
             gson = new Gson();
 
             header = itemView.findViewById(R.id.header);
@@ -254,7 +261,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             radioGroup.setOnCheckedChangeListener((group, checkedId) -> storeData());
 
             payment.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) setItemBackground(paymentParent, R.drawable.green_stroke);
+                if (isChecked) setItemBackground(paymentParent, R.drawable.blue_stroke_with_2dp_width);
                 else setItemBackground(paymentParent, R.drawable.input_filed);
                 storeData();
             });
@@ -517,7 +524,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
             if (data != null && data.getStartingTime() != null && !data.getStartingTime().equals("")) {
                 if (data.getHeader() != null) header.setText(data.getHeader());
-                else header.setText(HEADERS[getAdapterPosition()]);
+                else header.setText(HomeAdapter.this.headers[getAdapterPosition()]);
                 starting.setText(data.getStartingTime());
                 spinner.setVisibility(data.getSpinnerVisibility() == 8 ? View.GONE : View.VISIBLE);
                 spinner.setSelection(data.getSpinnerIndex());
@@ -541,9 +548,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
         } // End of save()
 
-        private RevenueDeviceData getRevenueDeviceDataInstance() {
+        private Temporal getRevenueDeviceDataInstance() {
             Duration duration = DateAndTime.timeDifference(String.valueOf(starting.getText()), String.valueOf(ending.getText()).equals("") ? DateAndTime.getCurrentTime() : String.valueOf(ending.getText()));
-            return new RevenueDeviceData(languageHandler(String.valueOf(starting.getText())), String.valueOf(ending.getText()).equals("") ? languageHandler(DateAndTime.getCurrentTime()) : languageHandler(String.valueOf(ending.getText())), solo.isChecked() ? "Solo" : "Multi", DateAndTime.durationToClockFormat(duration), Calculations.round(Calculations.priceCalculator(solo.isChecked(), duration)));
+            return new Temporal(languageHandler(String.valueOf(starting.getText())), String.valueOf(ending.getText()).equals("") ? languageHandler(DateAndTime.getCurrentTime()) : languageHandler(String.valueOf(ending.getText())), solo.isChecked() ? "Solo" : "Multi", DateAndTime.durationToClockFormat(duration), Calculations.round(Calculations.priceCalculator(solo.isChecked(), duration)));
         } // End of getDeviceInstance() -> save open time
 
         private void calculate() {
@@ -589,7 +596,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                     isRunning = true;
                     storeData();
                 } else {
-                    ConfirmationDialog.show(context, context.getString(R.string.are_you_sure_calculate), new ConfirmationDialog.ConfirmationDialogListener() {
+                    ConfirmationDialog dialog = new ConfirmationDialog(context.getString(R.string.are_you_sure_calculate), new ConfirmationDialog.ConfirmationDialogListener() {
                         @Override
                         public void onConfirm() {
                             calculate.setText(context.getString(R.string.calculate));
@@ -605,6 +612,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                             isStop = false;
                         }
                     });
+                    dialog.show(manager, "");
                 }
 
                 isStop = !isStop;
@@ -649,7 +657,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
             Intent intent = new Intent(context, AlarmReceiver.class);
 
             intent.putExtra(Common.NOTIFICATION_CONTENT, context.getString(R.string.notification_content).concat(String.format("\n%s %s", context.getString(R.string.required_to_be_paid), price)));
-            intent.putExtra(Common.NOTIFICATION_TITLE, String.format("%s %s", HEADERS[getAdapterPosition()], context.getString(R.string.notification_title)));
+            intent.putExtra(Common.NOTIFICATION_TITLE, String.format("%s %s", HomeAdapter.this.headers[getAdapterPosition()], context.getString(R.string.notification_title)));
             intent.putExtra(Common.ITEM_POSITION, getAdapterPosition());
 
             sharedPreferences.edit().putString(Common.REVENUE.concat(String.valueOf(getAdapterPosition())), gson.toJson(getRevenueDeviceDataInstance())).apply();
@@ -670,9 +678,10 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         }
 
         private void shutdownAlarm() {
-            if (pendingIntent != null) {
+            try {
                 alarmManager.cancel(pendingIntent);
                 pendingIntent = null;
+            } catch (Exception ignored) {
             }
         }
 

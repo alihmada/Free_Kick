@@ -20,7 +20,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -39,49 +38,28 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import ao.play.freekick.Activities.Main;
 import ao.play.freekick.Adapters.HomeAdapter;
 import ao.play.freekick.Classes.Capture;
 import ao.play.freekick.Classes.DateAndTime;
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
+import ao.play.freekick.Classes.FirstItemMarginDecoration;
+import ao.play.freekick.Classes.QRConstructor;
 import ao.play.freekick.Data.DataCollector;
 import ao.play.freekick.Data.Firebase;
 import ao.play.freekick.Dialogs.Loading;
+import ao.play.freekick.Dialogs.Qr;
 import ao.play.freekick.Intenet.Internet;
 import ao.play.freekick.Interfaces.ViewListener;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.R;
 
 public class Home extends Fragment implements ViewListener {
-    public static RecyclerView recyclerView;
-    SharedPreferences sharedPreferences;
-    Gson gson;
-    ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
-        try {
-            if (result.getContents() != null) {
-                String code = null;
-                try {
-                    code = EncryptionAndDecryption.decrypt(result.getContents());
-                } catch (Exception ignored) {
-                    Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
-                }
-
-                if (code != null) {
-                    List<Device> devices = Arrays.asList(gson.fromJson(code, Device[].class));
-
-                    for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
-                        languageHandler(devices.get(i), i);
-                    }
-
-                    HomeAdapter adapter = new HomeAdapter(requireContext(), devices, this);
-                    Home.recyclerView.setAdapter(adapter);
-                }
-            }
-        } catch (Exception ignored) {
-        }
-    }); // End of registerForActivityResult()
+    private ActivityResultLauncher<ScanOptions> scanOptionsActivityResultLauncher;
+    private SharedPreferences sharedPreferences;
+    private RecyclerView recyclerView;
     private Vibrator vibrator;
+    private Gson gson;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,26 +68,53 @@ public class Home extends Fragment implements ViewListener {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         try {
-            sharedPreferences = requireActivity().getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
+            sharedPreferences = requireActivity().getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), MODE_PRIVATE);
         } catch (Exception ignored) {
         }
 
         gson = new Gson();
 
         recyclerView = view.findViewById(R.id.home_recycler);
+        recyclerView.addItemDecoration(new FirstItemMarginDecoration(getResources().getDimensionPixelSize(R.dimen.margin)));
 
         DataCollector.collect(requireContext());
         List<Device> devices = Arrays.asList(DataCollector.getDevices());
 
+        setupScanOptionsActivityResultLauncher();
         setupRecyclerView(devices);
         setupVibrator();
 
         return view;
     }
 
+    private void setupScanOptionsActivityResultLauncher() {
+        scanOptionsActivityResultLauncher = registerForActivityResult(new ScanContract(), result -> {
+            try {
+                if (result.getContents() != null) {
+                    String code = null;
+                    try {
+                        code = Ciphering.decrypt(result.getContents());
+                    } catch (Exception ignored) {
+                        Toast.makeText(requireContext(), result.getContents(), Toast.LENGTH_LONG).show();
+                    }
+
+                    if (code != null) {
+                        List<Device> devices = Arrays.asList(gson.fromJson(code, Device[].class));
+
+                        for (int i = 0; i < Common.DEVICES_NUMBER; i++) {
+                            languageHandler(devices.get(i), i);
+                        }
+
+                        setupRecyclerView(devices);
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }); // End of registerForActivityResult()
+    }
+
     private void setupRecyclerView(List<Device> devices) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        HomeAdapter adapter = new HomeAdapter(requireContext(), devices, this);
+        HomeAdapter adapter = new HomeAdapter(requireContext(), getParentFragmentManager(), devices, this);
         recyclerView.setAdapter(adapter);
     }
 
@@ -141,17 +146,17 @@ public class Home extends Fragment implements ViewListener {
             download();
             return true;
         } else if (item.getItemId() == R.id.qr) {
-
             DataCollector.collect(requireContext());
-
-            Main.createQR(requireContext(), DataCollector.getData());
+            Qr qr = new Qr(QRConstructor.createQR(DataCollector.getData()));
+            qr.show(getParentFragmentManager(), "");
             return true;
         } else if (item.getItemId() == R.id.scanner) {
-
-            ScanOptions scanOptions = new ScanOptions();
-            scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
-            scanOptionsActivityResultLauncher.launch(scanOptions);
-
+            try {
+                setupScanner();
+            } catch (IllegalStateException e) {
+                setupScanOptionsActivityResultLauncher();
+                setupScanner();
+            }
             return true;
         } else if (item.getItemId() == R.id.delAll) {
             List<Device> devices = new ArrayList<>();
@@ -163,14 +168,19 @@ public class Home extends Fragment implements ViewListener {
                 sharedPreferences.edit().putString(String.valueOf(i), null).apply();
             }
 
-            HomeAdapter adapter = new HomeAdapter(requireContext(), devices, this);
-            Home.recyclerView.setAdapter(adapter);
+            setupRecyclerView(devices);
 
             return true;
         } else if (item.getItemId() == R.id.exit) {
             requireActivity().finish();
             return true;
         } else return super.onOptionsItemSelected(item);
+    }
+
+    private void setupScanner() {
+        ScanOptions scanOptions = new ScanOptions();
+        scanOptions.setBeepEnabled(true).setOrientationLocked(true).setCaptureActivity(Capture.class);
+        scanOptionsActivityResultLauncher.launch(scanOptions);
     }
 
     private void download() {
@@ -187,8 +197,7 @@ public class Home extends Fragment implements ViewListener {
                 }
 
                 if (deviceList.size() != 0) {
-                    HomeAdapter adapter = new HomeAdapter(requireContext(), deviceList, Home.this);
-                    Home.recyclerView.setAdapter(adapter);
+                    setupRecyclerView(deviceList);
                     Loading.dismissProgressDialog();
                 }
             }
@@ -203,15 +212,16 @@ public class Home extends Fragment implements ViewListener {
     @Override
     public void languageHandler(Device device, int position) {
         if (device != null) {
+            String[] headers = getResources().getStringArray(R.array.headers);
             if (device.getStartingTime().contains("م") || device.getStartingTime().contains("ص")) {
                 if (Locale.getDefault().getLanguage().equals("en")) {
-                    device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
+                    device.setHeader(headers[position]);
                     device.setStartingTime(device.getStartingTime().replace("م", "PM").replace("ص", "AM"));
                     device.setEndingTime(device.getEndingTime().replace("م", "PM").replace("ص", "AM"));
                 }
             } else if (device.getStartingTime().contains("PM") || device.getStartingTime().contains("AM")) {
                 if (Locale.getDefault().getLanguage().equals("ar")) {
-                    device.setHeader(HomeAdapter.ViewHolder.HEADERS[position]);
+                    device.setHeader(headers[position]);
                     device.setStartingTime(device.getStartingTime().replace("PM", "م").replace("AM", "ص"));
                     device.setEndingTime(device.getEndingTime().replace("PM", "م").replace("AM", "ص"));
                 }

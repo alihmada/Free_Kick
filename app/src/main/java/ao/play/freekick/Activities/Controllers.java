@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
@@ -13,13 +14,16 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.Objects;
 
 import ao.play.freekick.Adapters.FragmentViewPagerAdapter;
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Fragments.Buttons;
 import ao.play.freekick.Fragments.Inside;
 import ao.play.freekick.Fragments.Outside;
-import ao.play.freekick.Models.Common;
+import ao.play.freekick.Models.ControllerViewModel;
 import ao.play.freekick.R;
 
 public class Controllers extends AppCompatActivity {
+    String name;
+    ControllerViewModel model;
     TabLayout tabLayout;
     ViewPager viewPager;
 
@@ -31,6 +35,9 @@ public class Controllers extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).hide();
         getWindow().setStatusBarColor(getPrimaryColor());
 
+        name = getIntent().getStringExtra(Common.NAME);
+
+        setupViewModel();
         setupHeader();
 
         setupViewPager();
@@ -38,14 +45,14 @@ public class Controllers extends AppCompatActivity {
 
     private void setupHeader() {
         TextView id = findViewById(R.id.id);
-        id.setText(ao.play.freekick.Fragments.Controllers.controller.getId());
-
         TextView name = findViewById(R.id.name);
-        String controllerId = getIntent().getStringExtra(Common.ID);
-        name.setText(String.format("%s %s", getString(R.string.controller_no), controllerId));
-
         TextView time = findViewById(R.id.time);
-        time.setText(ao.play.freekick.Fragments.Controllers.controller.getTimeOfLastRepair());
+
+        model.getController().observe(this, controller -> {
+            id.setText(controller.getId());
+            name.setText(String.format("%s %s", getString(R.string.controller_no), controller.getId()));
+            time.setText(controller.getTimeOfLastRepair());
+        });
     }
 
     private void setupViewPager() {
@@ -55,11 +62,16 @@ public class Controllers extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         FragmentViewPagerAdapter ordersViewPagerAdapter = new FragmentViewPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
-        ordersViewPagerAdapter.addFragment(new Buttons(), getString(R.string.buttons));
-        ordersViewPagerAdapter.addFragment(new Outside(), getString(R.string.outside));
-        ordersViewPagerAdapter.addFragment(new Inside(), getString(R.string.inside));
+        ordersViewPagerAdapter.addFragment(new Buttons(name), getString(R.string.buttons));
+        ordersViewPagerAdapter.addFragment(new Outside(name), getString(R.string.outside));
+        ordersViewPagerAdapter.addFragment(new Inside(name), getString(R.string.inside));
 
         viewPager.setAdapter(ordersViewPagerAdapter);
+    }
+
+    private void setupViewModel() {
+        model = ViewModelProviders.of(this).get(ControllerViewModel.class);
+        model.initialize(this, name);
     }
 
     private int getPrimaryColor() {

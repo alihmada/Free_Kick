@@ -20,18 +20,18 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import ao.play.freekick.Classes.Common;
 import ao.play.freekick.Dialogs.ConfirmationDialog;
 import ao.play.freekick.Dialogs.Loading;
-import ao.play.freekick.Models.Common;
 import ao.play.freekick.R;
 
 public class CodeVerification extends AppCompatActivity {
-    FirebaseAuth mAuth;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
-    String verificationId;
     PhoneAuthProvider.ForceResendingToken token;
+    EditText[] verificationDigits;
+    String verificationId;
+    FirebaseAuth mAuth;
     Button otp;
-    private EditText[] verificationDigits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class CodeVerification extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mAuth.setLanguageCode("ar");
 
-        String phone = getIntent().getStringExtra(Common.PHONE_NUMBER);
+        String phone = Objects.requireNonNull(getIntent().getExtras()).getString(Common.PHONE_NUMBER);
 
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
 
@@ -67,7 +67,7 @@ public class CodeVerification extends AppCompatActivity {
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException error) {
-                ConfirmationDialog.show(CodeVerification.this, error.getLocalizedMessage(), new ConfirmationDialog.ConfirmationDialogListener() {
+                ConfirmationDialog dialog = new ConfirmationDialog(error.getLocalizedMessage(), new ConfirmationDialog.ConfirmationDialogListener() {
                     @Override
                     public void onConfirm() {
 
@@ -78,6 +78,8 @@ public class CodeVerification extends AppCompatActivity {
 
                     }
                 });
+
+                dialog.show(getSupportFragmentManager(), "");
             }
 
             @Override

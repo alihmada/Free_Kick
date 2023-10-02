@@ -13,10 +13,10 @@ import com.google.gson.JsonSyntaxException;
 import ao.play.freekick.Adapters.HomeAdapter;
 import ao.play.freekick.Classes.Calculations;
 import ao.play.freekick.Classes.Device;
-import ao.play.freekick.Classes.EncryptionAndDecryption;
+import ao.play.freekick.Classes.Ciphering;
 import ao.play.freekick.Data.Firebase;
-import ao.play.freekick.Models.Common;
-import ao.play.freekick.Models.RevenueDeviceData;
+import ao.play.freekick.Classes.Common;
+import ao.play.freekick.Models.Temporal;
 import ao.play.freekick.Services.VibrationNotificationService;
 
 public class AlarmReceiver extends BroadcastReceiver {
@@ -38,10 +38,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                     String revenueKey = getSharedPreferenceKey(position);
 
                     String revenue = sharedPreferences.getString(revenueKey, "");
-                    RevenueDeviceData revenueDeviceData = parseRevenueData(revenue, crashlytics, gson);
+                    Temporal temporal = parseRevenueData(revenue, crashlytics, gson);
 
-                    if (revenueDeviceData != null) {
-                        saveRevenueData(String.valueOf(Calculations.sum(position, 1)), revenueDeviceData, context);
+                    if (temporal != null) {
+                        saveRevenueData(String.valueOf(Calculations.sum(position, 1)), temporal, context);
                     }
 
                     transferDeviceDataToHistory(sharedPreferences, gson, String.valueOf(position));
@@ -54,7 +54,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private SharedPreferences getDecryptedSharedPreferences(Context context) {
         try {
-            return context.getSharedPreferences(EncryptionAndDecryption.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
+            return context.getSharedPreferences(Ciphering.decrypt(Common.SHARED_PREFERENCE_NAME), Context.MODE_PRIVATE);
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
         }
@@ -84,18 +84,18 @@ public class AlarmReceiver extends BroadcastReceiver {
         return Common.REVENUE.concat(String.valueOf(position));
     }
 
-    private RevenueDeviceData parseRevenueData(String revenue, FirebaseCrashlytics crashlytics, Gson gson) {
-        RevenueDeviceData revenueDeviceData = null;
+    private Temporal parseRevenueData(String revenue, FirebaseCrashlytics crashlytics, Gson gson) {
+        Temporal temporal = null;
         try {
-            revenueDeviceData = gson.fromJson(revenue, RevenueDeviceData.class);
+            temporal = gson.fromJson(revenue, Temporal.class);
         } catch (JsonSyntaxException e) {
             crashlytics.recordException(e);
         }
-        return revenueDeviceData;
+        return temporal;
     }
 
-    private void saveRevenueData(String deviceNumber, RevenueDeviceData revenueDeviceData, Context context) {
-        Firebase.save(deviceNumber, revenueDeviceData, context);
+    private void saveRevenueData(String deviceNumber, Temporal temporal, Context context) {
+        Firebase.save(deviceNumber, temporal, context);
     }
 
     private void transferDeviceDataToHistory(SharedPreferences sharedPreferences, Gson gson, String sharedPrefsKey) {

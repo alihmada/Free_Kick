@@ -5,8 +5,8 @@
     <dimen name="marginStartEnd">10dp</dimen>
     <dimen name="marginTopBottom">5dp</dimen>
     <dimen name="text_size">20sp</dimen>
-    <dimen name="card_corner_radius">15dp</dimen>
-    <dimen name="card_elevation">15dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_elevation">5dp</dimen>
     <dimen name="horizontal_padding">30dp</dimen>
     <dimen name="corner_size">20dp</dimen>
     <dimen name="components_height">60dp</dimen>
